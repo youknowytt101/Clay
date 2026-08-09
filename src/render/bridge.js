@@ -60,6 +60,14 @@ function matrixEquals(object, matrix) {
 }
 
 class RenderBridge {
+  setWorld(world) {
+    const state = bridgeState.get(this);
+    if (!state || state.destroyed) throw new Error('render bridge has been destroyed');
+    if (!world || typeof world.query !== 'function') fail('world must come from createWorld()');
+    state.world = world;
+    return this;
+  }
+
   sync() {
     const state = bridgeState.get(this);
     if (!state || state.destroyed) throw new Error('render bridge has been destroyed');
@@ -111,9 +119,11 @@ class RenderBridge {
         : null;
       const nextMatrixSignature = matrixSignature(matrix);
       const nextBoundsSignature = boundsSignature(bounds);
+      const entityChanged = record.entity !== entity;
       if (record.matrixSignature === nextMatrixSignature
         && record.boundsSignature === nextBoundsSignature
-        && matrixEquals(record.object, matrix)) continue;
+        && matrixEquals(record.object, matrix)
+        && !entityChanged) continue;
       applyMatrix(record.object, matrix);
       if (state.spatialIndex) {
         if (bounds && record.indexed) state.spatialIndex.update(entity, bounds);
@@ -121,6 +131,7 @@ class RenderBridge {
         else if (record.indexed) state.spatialIndex.remove(entity);
         record.indexed = Boolean(bounds);
       }
+      record.entity = entity;
       record.matrixSignature = nextMatrixSignature;
       record.boundsSignature = nextBoundsSignature;
       updated++;

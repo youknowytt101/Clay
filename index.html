@@ -3,16 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Clay · M1-f 渲染桥</title>
-  <style>
-    :root { color-scheme: dark; }
-    body { margin: 0; background: #14161a; color: #d8dee9; font: 14px/1.6 ui-monospace, monospace; }
-    #hud { position: fixed; top: 12px; left: 12px; white-space: pre; pointer-events: none; text-shadow: 0 1px 2px #000; }
-    canvas { display: block; }
-  </style>
+  <title>Clay · 编辑器</title>
 </head>
-<body>
-  <div id="hud">booting…</div>
+<body data-mobile-panel="outline">
+  <div id="app" class="editor-shell">
+    <header class="topbar">
+      <div class="brand"><strong>Clay</strong><span>场景编辑器</span></div>
+      <div class="toolbar-separator"></div>
+      <div class="tool-group" aria-label="变换工具">
+        <button class="icon-button mode-button" data-mode="translate" title="移动 (W)" aria-label="移动">T</button>
+        <button class="icon-button mode-button" data-mode="rotate" title="旋转 (E)" aria-label="旋转">R</button>
+        <button class="icon-button mode-button" data-mode="scale" title="缩放 (R)" aria-label="缩放">S</button>
+      </div>
+      <button id="undo" class="icon-button" title="撤销 (Ctrl+Z)" aria-label="撤销">↶</button>
+      <div class="topbar-spacer"></div>
+      <div class="mobile-tabs" role="tablist" aria-label="编辑器面板">
+        <button class="icon-button panel-button" data-panel="outline" aria-pressed="true">大纲</button>
+        <button class="icon-button panel-button" data-panel="details" aria-pressed="false">详情</button>
+      </div>
+    </header>
+    <main class="workspace">
+      <aside class="panel outline-panel">
+        <div class="panel-title">场景大纲 <span id="entity-count"></span></div>
+        <div class="panel-body">
+          <div class="outline-tools"><input id="outline-search" class="outline-search" type="search" placeholder="筛选实体" aria-label="筛选实体"></div>
+          <div id="outline" class="outline-tree" role="tree" aria-label="场景实体"></div>
+        </div>
+      </aside>
+      <section id="viewport" class="viewport-panel" aria-label="三维视口">
+        <div class="viewport-label">透视 · 编辑</div>
+        <div class="viewport-axis"><b>X</b><b>Y</b><b>Z</b></div>
+      </section>
+      <aside class="panel inspector-panel">
+        <div class="panel-title">详情 <span>Schema</span></div>
+        <div id="inspector" class="panel-body inspector-content"></div>
+      </aside>
+    </main>
+    <footer class="statusbar">
+      <span id="editor-status" class="status-message">正在建立编辑会话</span>
+      <span class="status-hint">Shift 多选 · 拖框选择 · F 聚焦</span>
+    </footer>
+  </div>
+  <div id="selection-rect" class="selection-rect" hidden></div>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

@@ -3,11 +3,11 @@
 > **一个 AI 与人共用同一条编辑通道的通用 3D 网页游戏引擎编辑器：
 > 游戏逻辑是数据，AI 和鼠标是同一个命令层的两个前端，产出的是同一种材料。**
 
-**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f 已落地。**
+**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f / M1-h 已落地。**
 
 ```bash
-npm install && npm test        # headless 断言（49 项）
-npm run dev                    # 浏览器自检：ECS → three 只读渲染投影与拾取
+npm install && npm test        # headless 断言（56 项）
+npm run dev                    # 第一版编辑器：大纲 / 详情 / gizmo / 多选
 ```
 
 [ADR-002](docs/design/adr-002-eventsheet-eval.md)（事件表求值语义，全项目唯一不可逆项）
@@ -167,7 +167,7 @@ python tools/build-preview.py
 | ⚠️ **物理确定性**（决策 29） | [spike-001](docs/design/spike-001-rapier-determinism.md)——同机与跨 V8 版本通过；**跨 CPU 架构未验**（需第二台机器，截止点闸门 A） |
 | ⬜ **决策治理回放**（决策 42） | [ADR-004](docs/design/adr-004-evidence-governed-evolution.md) G1–G3 未做。横切约束，**不阻塞 M1** |
 
-### M1-a / M1-b / M1-c / M1-d / M1-f 已完成；下一步是 M1-h
+### M1-a / M1-b / M1-c / M1-d / M1-f / M1-h 已完成；下一步是 M1-i
 
 **M1-a ECS 封装层**已经提供稳定实体 id、按 id 升序的 `query()`、声明式组件 schema、
 连续版本迁移与结构化诊断；生产代码只在适配层导入 koota。9 项 M1-a 测试含 koota 原始错序与半写负例，
@@ -190,7 +190,12 @@ oracle 不得改世界后自称通过；`U-043` / `U-044` 仍保持活动，具�
 9 项测试覆盖层级与序列化、循环和无效父节点、索引更新的原子性、稳定命中顺序、投影增删改、动态 bounds 与渲染对象不得回写 ECS。
 浏览器自检已迁移到真实 ECS 投影，并能点击选中稳定实体 id；BVH 与射线候选加速仍按路线图后置。
 
-下一步做 **M1-h 编辑器改造**，交付第一版真正可操作的编辑器界面：大纲、详情、gizmo 与多选。
+**M1-h** 已交付第一版真正可操作的编辑器：ECS 父子大纲、schema 自动详情、点选 / Ctrl 多选 / 拖框、
+translate / rotate / scale gizmo、轨道相机与响应式移动面板。编辑器选择只存稳定 id，不进世界快照；
+属性输入与 gizmo 松手统一提交 `editor.patch-components` Action，并共享现有 revision、checkpoint 与撤销栈。
+6 项 M1-h 测试覆盖 GUI / Action revision 对拍、批量回滚、选择隔离、世界替换重绑定、层级环拒绝与父子 gizmo 补丁。
+
+下一步做 **M1-i 最小 AI 单步指令**，验证模型与人能否复用同一条 Action 通道和事务回执；随后进入 M1-g 分块流式加载。
 
 完整的包拆分、依赖、砍单顺序见 [roadmap.md](docs/design/roadmap.md) M1。
 

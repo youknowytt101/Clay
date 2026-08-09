@@ -130,3 +130,32 @@ test('新投影工厂失败不会删除既有 Object3D', () => {
   bridge.destroy();
   world.destroy();
 });
+
+// @covers I3 I7 M1-h:world-replacement M1-h:projection-rebind
+test('世界替换后按稳定 id 重绑定实体并保留 Object3D 身份', () => {
+  const firstWorld = createWorld();
+  const firstEntity = firstWorld.spawn(Transform({ x: 1 }));
+  const secondWorld = createWorld();
+  const secondEntity = secondWorld.spawn(Transform({ x: 9 }));
+  const scene = new THREE.Scene();
+  const index = createGridSpatialIndex({ cellSize: 2 });
+  const bridge = createRenderBridge({
+    world: firstWorld,
+    scene,
+    spatialIndex: index,
+    createObject: () => new THREE.Object3D(),
+    boundsForEntity: () => LOCAL_BOUNDS,
+  });
+  bridge.sync();
+  const object = bridge.getObject(firstEntity);
+
+  bridge.setWorld(secondWorld);
+  assert.deepEqual(bridge.sync(), { created: 0, updated: 1, removed: 0 });
+  assert.equal(bridge.getObject(secondEntity), object);
+  assert.equal(position(object).x, 9);
+  assert.equal(bridge.pick({ x: 0, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }).entity, secondEntity);
+  assert.notEqual(secondEntity, firstEntity, '负例：重绑定必须返回新世界实体而不是旧对象引用');
+  bridge.destroy();
+  firstWorld.destroy();
+  secondWorld.destroy();
+});

@@ -172,8 +172,9 @@ python tools/build-preview.py
 | ✅ **M1-c 序列化与 checkpoint** | 确定性版本信封 + SHA-256 revision + 按块存取 + 迁移链 + 精确运行时注册表 + 命名 checkpoint；6 项测试。`U-039` 关闭 |
 | ✅ **M1-d 试飞台 + TestSpec** | registry + 固定 seed + checkpoint / 候选世界隔离 + 两层输入适配 + hard / soft oracle + 确定性证据 + M1-b validator；8 项测试。`U-043` / `U-044` 仍活动 |
 | ✅ **M1-f 渲染桥 + Transform + 拾取 + 空间索引** | ECS Transform 层级 + 稳定网格索引 + 实体射线拾取 + Three.js 增量只读投影；9 项测试覆盖层级失败、索引原子性、稳定命中、投影生命周期与禁止回写 |
+| ✅ **M1-h 编辑器改造** | ECS 大纲 + schema 详情 + 点选 / 多选 / 拖框 + 三模式 gizmo + 响应式工作台；所有持久编辑统一走 Action 事务；6 项测试覆盖 GUI 对拍、批量回滚、选择隔离、世界重绑定、层级环拒绝与父子变换 |
 
-- **下一步**：**M1-h 编辑器改造**，交付第一版真正可操作的编辑器界面：大纲 / 详情 / gizmo / 多选。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
+- **下一步**：**M1-i 最小 AI 单步指令**，验证 Action 通道形状与重复请求幂等；随后做 M1-g 分块流式加载。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
 
 > **不要往设计文档里加新范围。** 决策密度仍然超前于实现进度。
 >
