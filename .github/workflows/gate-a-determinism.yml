@@ -1,0 +1,57 @@
+name: Gate A cross-architecture determinism
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - package.json
+      - package-lock.json
+      - src/core/ecs.js
+      - src/core/transform.js
+      - tools/spikes/rapier-determinism.mjs
+      - .github/workflows/gate-a-determinism.yml
+
+permissions:
+  contents: read
+
+jobs:
+  x64-baseline:
+    name: Linux x64 baseline
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run spike:gate-a -- --emit gate-a-x64.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gate-a-x64
+          path: gate-a-x64.json
+          if-no-files-found: error
+
+  arm64-compare:
+    name: Linux ARM64 comparison
+    needs: x64-baseline
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: gate-a-x64
+          path: evidence
+      - run: npm run spike:gate-a -- --compare evidence/gate-a-x64.json --emit gate-a-arm64.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-a-arm64
+          path: gate-a-arm64.json
+          if-no-files-found: ignore
