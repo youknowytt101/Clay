@@ -1,0 +1,80 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Rapier determinism · browser runtime</title>
+<pre id="out">running…</pre>
+<script type="module">
+import RAPIER from './node_modules/@dimforge/rapier3d-compat/dist/rapier.mjs';
+
+const STEPS = 600, DT = 1 / 60;
+const log = [];
+const say = (s) => { log.push(s); document.getElementById('out').textContent = log.join('\n'); };
+
+async function sha(bytes) {
+  const d = await crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+}
+
+function buildWorld(perturb = 0) {
+  const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
+  world.timestep = DT;
+  const ground = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
+  world.createCollider(
+    RAPIER.ColliderDesc.cuboid(20, 0.5, 20).setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS),
+    ground);
+  const bodies = [];
+  let n = 0;
+  for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) for (let k = 0; k < 2; k++) {
+    const b = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic()
+      .setTranslation(i * 1.05 - 2.1 + (n === 0 ? perturb : 0), 3 + k * 1.4, j * 1.05 - 2.1));
+    world.createCollider(RAPIER.ColliderDesc.cuboid(0.5, 0.5, 0.5)
+      .setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS).setRestitution(0.35), b);
+    bodies.push(b); n++;
+  }
+  return { world, bodies };
+}
+
+async function run(perturb = 0) {
+  const { world, bodies } = buildWorld(perturb);
+  const eq = new RAPIER.EventQueue(true);
+  const stateHashes = [], eventHashes = [];
+  let totalEvents = 0;
+  for (let s = 0; s < STEPS; s++) {
+    world.step(eq);
+    const ev = [];
+    eq.drainCollisionEvents((h1, h2, started) => ev.push(`${h1},${h2},${started ? 1 : 0}`));
+    totalEvents += ev.length;
+    eventHashes.push(await sha(new TextEncoder().encode(ev.join('|'))));
+    const buf = new DataView(new ArrayBuffer(bodies.length * 7 * 8));
+    let off = 0;
+    for (const b of bodies) {
+      const t = b.translation(), r = b.rotation();
+      for (const v of [t.x, t.y, t.z, r.x, r.y, r.z, r.w]) { buf.setFloat64(off, v, true); off += 8; }
+    }
+    stateHashes.push(await sha(buf.buffer));
+  }
+  world.free(); eq.free();
+  return { stateHashes, eventHashes, totalEvents };
+}
+
+await RAPIER.init();
+say(`Rapier spike · browser runtime · ${STEPS} steps`);
+say(`UA: ${navigator.userAgent}`);
+
+const A = await run();
+const B = await run();
+const same = (x, y) => x.every((v, i) => v === y[i]);
+
+say(`\n接触事件总数：${A.totalEvents} / ${B.totalEvents}`);
+say(`状态序列一致：${same(A.stateHashes, B.stateHashes) ? '是' : '否'}`);
+say(`事件序列一致：${same(A.eventHashes, B.eventHashes) ? '是' : '否'}`);
+
+const st = await sha(new TextEncoder().encode(A.stateHashes.join('')));
+const evh = await sha(new TextEncoder().encode(A.eventHashes.join('')));
+say(`\n跨机器比对指纹：`);
+say(`  state = ${st}`);
+say(`  event = ${evh}`);
+say(`\nnode 侧指纹（对照）：`);
+say(`  state = 85cff7f8f866e20f`);
+say(`  event = 3f0480a84fcddd29`);
+say(`\n跨运行时判定：state ${st === '85cff7f8f866e20f' ? '一致' : '不一致 ←'} · event ${evh === '3f0480a84fcddd29' ? '一致' : '不一致 ←'}`);
+</script>

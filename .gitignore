@@ -2,3 +2,14 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# CodeGraph 本地索引（774K，随工作区重建）
+.codegraph/
+
+# 本地个人设置；.claude/launch.json 是项目配置，要提交
+.claude/settings.local.json
+
+# 生成物：派生自当前状态，每次跑都会变（含代码行数等实测值）。
+# 用 `npm run status` 随时重新生成，不进版本控制以免制造噪声 diff。
+# 注意 preview.html 相反——它是给人一次读完全部文档的分发物，要提交。
+STATUS.md

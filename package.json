@@ -1,0 +1,27 @@
+{
+  "name": "clay",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AI 与人共用同一条编辑通道的通用 3D 网页游戏引擎编辑器",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/**/*.test.mjs",
+    "spike:rapier": "node tools/spikes/rapier-determinism.mjs",
+    "check:docs": "python tools/check-docs.py",
+    "build:preview": "python tools/build-preview.py",
+    "status": "python tools/status.py"
+  },
+  "//": "物理与渲染依赖必须锁精确版本，不用 ^ 范围。Rapier 0.19.3 与 0.20.0 在同一场景下跑出不同的状态与事件序列（见 docs/design/spike-001-rapier-determinism.md），版本漂移会直接违反不变量 I11。",
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "0.20.0",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "bitecs": "^0.4.0",
+    "koota": "^0.6.6",
+    "vite": "7.3.6"
+  }
+}
