@@ -481,7 +481,7 @@
 preview / commit / abort、幂等、revision 冲突、checkpoint、日志与撤销；试飞台提供 TestSpec / oracle registry、
 固定 seed、两层输入适配、隔离沙箱、hard / soft 判定、确定性证据与 Action validator；渲染桥提供可序列化 ECS Transform
 层级、稳定网格索引、实体射线拾取，以及 ECS → Three.js 的增量只读投影；编辑器提供 ECS 父子大纲、schema 自动详情、
-点选 / 多选 / 拖框、三模式 gizmo 与响应式工作台，属性和 gizmo 编辑统一进入 Action 事务与同一撤销栈。
+点选 / 多选 / 拖框、三模式 gizmo 与桌面三栏工作台，属性和 gizmo 编辑统一进入 Action 事务与同一撤销栈。
 `npm test` 有 56 项 headless 断言；`U-002`、`U-039`、`U-041`、`U-042` 已关闭；`U-043` / `U-044` 仍活动。
 待做：M1-i、M1-g、ADR-004 三个治理回放、Rapier 跨 CPU 架构实测。
 

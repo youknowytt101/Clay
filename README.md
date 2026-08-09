@@ -191,7 +191,7 @@ oracle 不得改世界后自称通过；`U-043` / `U-044` 仍保持活动，具�
 浏览器自检已迁移到真实 ECS 投影，并能点击选中稳定实体 id；BVH 与射线候选加速仍按路线图后置。
 
 **M1-h** 已交付第一版真正可操作的编辑器：ECS 父子大纲、schema 自动详情、点选 / Ctrl 多选 / 拖框、
-translate / rotate / scale gizmo、轨道相机与响应式移动面板。编辑器选择只存稳定 id，不进世界快照；
+translate / rotate / scale gizmo、轨道相机与桌面三栏工作台。编辑器选择只存稳定 id，不进世界快照；
 属性输入与 gizmo 松手统一提交 `editor.patch-components` Action，并共享现有 revision、checkpoint 与撤销栈。
 6 项 M1-h 测试覆盖 GUI / Action revision 对拍、批量回滚、选择隔离、世界替换重绑定、层级环拒绝与父子 gizmo 补丁。
 
