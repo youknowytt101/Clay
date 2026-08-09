@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Clay · 设计文档总览</title>
+<style>
+:root{--bg:#fff;--bg2:#f7f7f6;--panel:#fbfbfa;--bd:#e3e2df;--bd2:#cfcecb;
+--tx:#1f1f1e;--tx2:#575653;--tx3:#8a8985;--ac:#2f6fd0;--acbg:#eaf1fb;--code:#f2f1ee;--maxw:880px}
+@media (prefers-color-scheme:dark){:root{--bg:#191918;--bg2:#1f1f1e;--panel:#212120;--bd:#343432;
+--bd2:#45443f;--tx:#e9e8e5;--tx2:#adaca7;--tx3:#7f7e7a;--ac:#7cabec;--acbg:#1d2a3d;--code:#262624}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.75 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--ac);text-decoration:none}
+a:hover{text-decoration:underline}
+#top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--bd)}
+#top b{font-weight:500}
+#top .v{color:var(--tx3);font-size:12px}
+#top .sp{flex:1}
+#top button{font:inherit;font-size:12px;color:var(--tx2);background:var(--bg2);border:1px solid var(--bd);border-radius:6px;padding:4px 10px;cursor:pointer}
+#top button:hover{border-color:var(--bd2);color:var(--tx)}
+#wrap{display:flex;align-items:flex-start}
+#nav{position:sticky;top:47px;flex:0 0 272px;height:calc(100vh - 47px);overflow-y:auto;padding:16px 10px 60px 18px;border-right:1px solid var(--bd);background:var(--panel)}
+#nav input{width:100%;font:inherit;font-size:12px;padding:5px 8px;margin-bottom:10px;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:6px}
+#nav .d{margin:13px 0 3px;font-size:12px;font-weight:500;color:var(--tx)}
+#nav a{display:block;padding:2px 6px 2px 10px;font-size:12.5px;color:var(--tx2);border-left:2px solid transparent;border-radius:0 4px 4px 0;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#nav a.l3{padding-left:22px;font-size:12px;color:var(--tx3)}
+#nav a:hover{background:var(--bg2);color:var(--tx);text-decoration:none}
+#nav a.on{color:var(--ac);border-left-color:var(--ac);background:var(--acbg)}
+main{flex:1;min-width:0;padding:0 40px 140px}
+section.doc{max-width:var(--maxw);margin:0 auto}
+.dt{margin:38px 0 16px;padding:9px 0 9px 14px;border-left:3px solid var(--ac);background:var(--bg2);font-size:13px;color:var(--tx2)}
+.dt b{display:block;font-size:17px;font-weight:500;color:var(--tx)}
+h1,h2,h3,h4{font-weight:500;line-height:1.35;scroll-margin-top:62px}
+h1{font-size:24px;margin:26px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+h2{font-size:19px;margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+h3{font-size:16px;margin:26px 0 8px}
+h4{font-size:14.5px;margin:20px 0 6px;color:var(--tx2)}
+p{margin:10px 0}
+ul,ol{margin:10px 0;padding-left:24px}
+li{margin:4px 0}
+hr{border:0;border-top:1px solid var(--bd);margin:26px 0}
+blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid var(--bd2);background:var(--bg2);color:var(--tx2);border-radius:0 6px 6px 0}
+blockquote strong{color:var(--tx)}
+code{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;background:var(--code);padding:1px 5px;border-radius:4px}
+pre{background:var(--code);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:14px 0}
+pre code{background:none;padding:0;line-height:1.6}
+.tw{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{border:1px solid var(--bd);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:500}
+tbody tr:nth-child(even){background:var(--bg2)}
+del{color:var(--tx3)}
+figure{margin:22px 0;padding:18px;background:var(--panel);border:1px solid var(--bd);border-radius:10px}
+figure svg{display:block;max-width:100%;height:auto;margin:0 auto}
+figcaption{margin-top:12px;font-size:12.5px;color:var(--tx3);text-align:center}
+@media print{#nav,#top{display:none}main{padding:0}section.doc{max-width:none}body{font-size:10.5pt}
+pre,.tw,figure{page-break-inside:avoid}h1,h2{page-break-after:avoid}}
+@media (max-width:900px){#nav{display:none}main{padding:0 18px 80px}}
+</style></head><body>
+<div id="top"><b>Clay</b><span class="v">设计文档总览 · goals v18 · 2026-08-08</span><span class="sp"></span>
+<button onclick="window.print()">打印 / 存 PDF</button></div>
+<div id="wrap"><nav id="nav"><input id="q" placeholder="过滤章节…" autocomplete="off"></nav>
+<main id="main"></main></div>
+<script>
+var DOCS=__DOCS__,SVGS=__SVGS__;
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function slug(s){return s.replace(/[`*_~\[\]()#§·、，。：:.,\/]/g,"").trim().toLowerCase().replace(/\s+/g,"-")}
+function inl(s,did){
+var codes=[];
+s=s.replace(/`([^`]+)`/g,function(m,c){codes.push(c);return ""+(codes.length-1)+""});
+s=esc(s);
+s=s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,function(m,t,u){
+if(u.charAt(0)==="#")u="#"+did+"-"+u.slice(1).replace(/^-+/,"");
+else if(u.indexOf("diagrams/architecture.svg")>=0)u="#fig-arch";
+else if(u.indexOf("diagrams/user-flow.svg")>=0)u="#fig-flow";
+else if(!/^https?:/.test(u))return t;
+return '<a href="'+u+'">'+t+"</a>"});
+s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+s=s.replace(/~~([^~]+)~~/g,"<del>$1</del>");
+s=s.replace(/(\d+)/g,function(m,i){return "<code>"+esc(codes[+i])+"</code>"});
+return s}
+function cells(line){
+return line.replace(/\\\|/g,"").replace(/^\||\|$/g,"").split("|").map(function(c){return c.replace(//g,"|").trim()})}
+function md(src,did){
+var L=src.replace(/\r/g,"").split("\n"),o=[],i=0,heads=[];
+function bs(l){return /^(#{1,4}\s|>|\||```|---+\s*$|[-*]\s|\d+\.\s)/.test(l)}
+while(i<L.length){
+var l=L[i];
+if(/^```/.test(l)){var b=[];i++;while(i<L.length&&!/^```/.test(L[i])){b.push(L[i]);i++}i++;
+o.push("<pre><code>"+esc(b.join("\n"))+"</code></pre>");continue}
+var h=l.match(/^(#{1,4})\s+(.*)$/);
+if(h){var lv=h[1].length,tx=h[2],id=did+"-"+slug(tx);
+heads.push({lv:lv,tx:tx.replace(/[*`~]/g,""),id:id});
+o.push("<h"+lv+' id="'+id+'">'+inl(tx,did)+"</h"+lv+">");i++;continue}
+if(/^---+\s*$/.test(l)){o.push("<hr>");i++;continue}
+if(/^>/.test(l)){var q=[];while(i<L.length&&/^>/.test(L[i])){q.push(L[i].replace(/^>\s?/,""));i++}
+o.push("<blockquote>"+q.map(function(x){return inl(x,did)}).join("<br>")+"</blockquote>");continue}
+if(/^\|/.test(l)){var rows=[];
+while(i<L.length&&(/^\|/.test(L[i])||(rows.length&&L[i].trim()&&!bs(L[i])))){
+if(/^\|/.test(L[i]))rows.push(cells(L[i]));
+else{var r=rows[rows.length-1];r[r.length-1]+=" "+L[i].trim()}i++}
+var sep=rows.length>1&&rows[1].every(function(c){return /^:?-+:?$/.test(c)});
+var hd=sep?rows[0]:null,bd=sep?rows.slice(2):rows,t='<div class="tw"><table>';
+if(hd)t+="<thead><tr>"+hd.map(function(c){return "<th>"+inl(c,did)+"</th>"}).join("")+"</tr></thead>";
+t+="<tbody>"+bd.map(function(r){return "<tr>"+r.map(function(c){return "<td>"+inl(c,did)+"</td>"}).join("")+"</tr>"}).join("")+"</tbody></table></div>";
+o.push(t);continue}
+var m=l.match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
+if(m){var ord=/\d/.test(m[2]),it=[];
+while(i<L.length){var mm=L[i].match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
+if(mm){it.push(mm[3]);i++}
+else if(L[i].trim()&&!bs(L[i])&&it.length){it[it.length-1]+=" "+L[i].trim();i++}
+else break}
+var tg=ord?"ol":"ul";
+o.push("<"+tg+">"+it.map(function(x){return "<li>"+inl(x,did)+"</li>"}).join("")+"</"+tg+">");continue}
+if(!l.trim()){i++;continue}
+var p=[];while(i<L.length&&L[i].trim()&&!bs(L[i])){p.push(L[i].trim());i++}
+if(p.length)o.push("<p>"+inl(p.join(" "),did)+"</p>")}
+return {html:o.join("\n"),heads:heads}}
+var main=document.getElementById("main"),nav=document.getElementById("nav"),nh="";
+var fig=document.createElement("section");fig.className="doc";
+var fx='<div class="dt"><b>总览图</b>六图合一：系统全景 · 数据模型 · 一帧发生什么 · 用户流程 · 编辑器界面 · 能力覆盖面。先看图再读文；内容以产品设计大纲为准，图跟着它改</div>';
+SVGS.forEach(function(s){fx+='<figure id="fig-'+s.id+'">'+s.svg+"<figcaption>"+s.title+"</figcaption></figure>"});
+fig.innerHTML=fx;main.appendChild(fig);
+nh+='<div class="d">图</div><a href="#fig-arch">编辑器架构</a><a href="#fig-flow">用户心流</a>';
+DOCS.forEach(function(d){
+var r=md(d.md,d.id),sec=document.createElement("section");
+sec.className="doc";sec.id="doc-"+d.id;
+sec.innerHTML='<div class="dt"><b>'+d.title+"</b></div>"+r.html;
+main.appendChild(sec);
+nh+='<div class="d">'+d.title+"</div>";
+r.heads.forEach(function(h){if(h.lv>3)return;nh+='<a class="l'+h.lv+'" href="#'+h.id+'">'+h.tx+"</a>"})});
+nav.insertAdjacentHTML("beforeend",nh);
+var links=[].slice.call(nav.querySelectorAll("a")),q=document.getElementById("q");
+q.addEventListener("input",function(){var v=q.value.trim().toLowerCase();
+links.forEach(function(a){a.style.display=!v||a.textContent.toLowerCase().indexOf(v)>=0?"":"none"});
+[].forEach.call(nav.querySelectorAll(".d"),function(d){d.style.display=v?"none":""})});
+if(window.IntersectionObserver){
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;
+var a=null;links.forEach(function(x){if(x.getAttribute("href")==="#"+e.target.id)a=x});
+if(!a)return;links.forEach(function(x){x.classList.remove("on")});a.classList.add("on");
+var t=a.offsetTop-nav.clientHeight/2;if(t>0)nav.scrollTop=t})},{rootMargin:"-60px 0px -75% 0px"});
+[].forEach.call(main.querySelectorAll("h1,h2,h3,figure"),function(el){if(el.id)obs.observe(el)})}
+</script></body></html>

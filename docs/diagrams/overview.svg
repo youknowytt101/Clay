@@ -1,0 +1,261 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="1848" viewBox="0 0 680 1848" role="img">
+<title>Clay 总览图 · 对应 goals.md v17</title>
+<desc>六张图合成一份：系统全景（单一变更通道与分层）、数据模型（工程里有什么）、一帧发生什么（玩法 tick 与渲染帧分离）、用户流程（八步与主循环）、编辑器界面分区、能力覆盖面（三道闸与七款目标游戏的灰盒判定）。</desc>
+<style>
+svg{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:transparent}
+.cl-h{font-size:15px;font-weight:500;fill:#1a1a1a}
+.cl-n{font-size:11px;font-weight:500;fill:#8a8a8a;letter-spacing:.08em}
+.cl-t{font-size:13px;fill:#1a1a1a}
+.cl-tb{font-size:13px;font-weight:500;fill:#1a1a1a}
+.cl-s{font-size:10.5px;fill:#6a6a6a}
+.cl-b rect,rect.cl-b{fill:#fbfbfb;stroke:#c9c9c9;stroke-width:.5}
+.cl-blue rect,rect.cl-blue{fill:#e4edfa;stroke:#7ba3d9;stroke-width:.5}
+.cl-teal rect,rect.cl-teal{fill:#e0f0ee;stroke:#6fb3aa;stroke-width:.5}
+.cl-warn rect,rect.cl-warn{fill:#faf0e0;stroke:#d3a55f;stroke-width:.5}
+.cl-off rect,rect.cl-off{fill:#f4f4f4;stroke:#d8d8d8;stroke-width:.5;stroke-dasharray:4 3}
+.cl-a{stroke:#8a8a8a;stroke-width:1.4;fill:none}
+.cl-d{stroke:#a8a8a8;stroke-width:1.2;fill:none;stroke-dasharray:4 3}
+.cl-l{stroke:#c9c9c9;stroke-width:.5;fill:none}
+.cl-sep{stroke:#e0e0e0;stroke-width:1}
+@media (prefers-color-scheme:dark){
+.cl-h,.cl-t,.cl-tb{fill:#e8e8e8}.cl-s{fill:#a0a0a0}.cl-n{fill:#7a7a7a}
+.cl-b rect,rect.cl-b{fill:#242424;stroke:#4a4a4a}
+.cl-blue rect,rect.cl-blue{fill:#1e3050;stroke:#4a7ab5}
+.cl-teal rect,rect.cl-teal{fill:#153330;stroke:#3f8b81}
+.cl-warn rect,rect.cl-warn{fill:#3a2f1c;stroke:#8a6a34}
+.cl-off rect,rect.cl-off{fill:#1e1e1e;stroke:#3d3d3d}
+.cl-a{stroke:#8f8f8f}.cl-d{stroke:#6f6f6f}.cl-l{stroke:#4a4a4a}.cl-sep{stroke:#333}}
+</style>
+<defs><marker id="cl-ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+<!-- ══════════ 1 · 系统全景 ══════════ -->
+<text class="cl-n" x="30" y="26">1</text>
+<text class="cl-h" x="48" y="27">系统全景 · 单一变更通道</text>
+<text class="cl-s" x="48" y="44">编辑期一切变更只经 Action 层；模块不得直接 import ECS 库；视听层只读</text>
+
+<g class="cl-teal"><rect x="40" y="58" width="386" height="42" rx="4"/></g>
+<text class="cl-tb" x="233" y="76" text-anchor="middle">编辑器 UI · 一套全集</text>
+<text class="cl-s" x="233" y="91" text-anchor="middle">大纲 · 详情 · 事件表 · 数据表 · 状态机 · 皮肤 · 教程</text>
+<g class="cl-teal"><rect x="438" y="58" width="202" height="42" rx="4"/></g>
+<text class="cl-tb" x="539" y="76" text-anchor="middle">AI 作者接口</text>
+<text class="cl-s" x="539" y="91" text-anchor="middle">describe · list · apply</text>
+
+<line class="cl-a" x1="233" y1="102" x2="233" y2="120" marker-end="url(#cl-ar)"/>
+<line class="cl-a" x1="539" y1="102" x2="539" y2="120" marker-end="url(#cl-ar)"/>
+
+<g class="cl-blue"><rect x="40" y="123" width="600" height="44" rx="4"/></g>
+<text class="cl-tb" x="340" y="142" text-anchor="middle">Action 层 · 编辑期唯一变更通道</text>
+<text class="cl-s" x="340" y="158" text-anchor="middle">registry（schema · 前置条件 · 影响域 · 可逆性）· 撤销栈 · 变更日志</text>
+
+<line class="cl-a" x1="340" y1="169" x2="340" y2="185" marker-end="url(#cl-ar)"/>
+
+<rect class="cl-b" x="40" y="188" width="600" height="36" rx="4"/>
+<text class="cl-t" x="340" y="205" text-anchor="middle">ECS 封装层（自写）</text>
+<text class="cl-s" x="340" y="218" text-anchor="middle">defineComponent · query · 组件 schema · 模块契约的执行点</text>
+
+<g class="cl-off"><rect x="40" y="228" width="600" height="28" rx="4"/></g>
+<text class="cl-s" x="340" y="246" text-anchor="middle">第三方 ECS 库（koota）· 可替换，代价约 800 行</text>
+
+<line class="cl-a" x1="111" y1="258" x2="111" y2="274" marker-end="url(#cl-ar)"/>
+<line class="cl-a" x1="263" y1="258" x2="263" y2="274" marker-end="url(#cl-ar)"/>
+<line class="cl-a" x1="415" y1="258" x2="415" y2="274" marker-end="url(#cl-ar)"/>
+<line class="cl-a" x1="567" y1="258" x2="567" y2="274" marker-end="url(#cl-ar)"/>
+
+<rect class="cl-b" x="40" y="277" width="142" height="52" rx="4"/>
+<text class="cl-t" x="111" y="296" text-anchor="middle">事件表运行时</text>
+<text class="cl-s" x="111" y="311" text-anchor="middle">逐行求值</text>
+<text class="cl-s" x="111" y="323" text-anchor="middle">行为单元</text>
+<rect class="cl-b" x="192" y="277" width="142" height="52" rx="4"/>
+<text class="cl-t" x="263" y="296" text-anchor="middle">系统（JS）</text>
+<text class="cl-s" x="263" y="311" text-anchor="middle">播放期</text>
+<text class="cl-s" x="263" y="323" text-anchor="middle">确定性沙箱</text>
+<rect class="cl-b" x="344" y="277" width="142" height="52" rx="4"/>
+<text class="cl-t" x="415" y="296" text-anchor="middle">物理与空间</text>
+<text class="cl-s" x="415" y="311" text-anchor="middle">Rapier · 关节</text>
+<text class="cl-s" x="415" y="323" text-anchor="middle">寻路 · 视野</text>
+<rect class="cl-b" x="496" y="277" width="144" height="52" rx="4"/>
+<text class="cl-t" x="568" y="296" text-anchor="middle">渲染桥</text>
+<text class="cl-s" x="568" y="311" text-anchor="middle">组件 + 皮肤</text>
+<text class="cl-s" x="568" y="323" text-anchor="middle">→ three.js</text>
+
+<line class="cl-a" x1="111" y1="360" x2="111" y2="332" marker-end="url(#cl-ar)"/>
+<rect class="cl-b" x="40" y="362" width="600" height="40" rx="4"/>
+<text class="cl-t" x="56" y="379">领域模块</text>
+<text class="cl-s" x="56" y="393">① RTS / MOBA　② 第三人称动作　= 组件 + 系统 + 条件动作 + kinds + 约束 + 面板 + 皮肤 + 模板</text>
+
+<line class="cl-sep" x1="30" y1="428" x2="650" y2="428"/>
+
+<!-- ══════════ 2 · 数据模型 ══════════ -->
+<text class="cl-n" x="30" y="460">2</text>
+<text class="cl-h" x="48" y="461">数据模型 · 一个工程里有什么</text>
+<text class="cl-s" x="48" y="478">全部是数据，全部走 Action 层，全部可被 AI 读写</text>
+
+<text class="cl-tb" x="52" y="503">工程</text>
+<line class="cl-l" x1="58" y1="509" x2="58" y2="692"/>
+<line class="cl-l" x1="58" y1="521" x2="70" y2="521"/><text class="cl-t" x="76" y="525">流程</text><text class="cl-s" x="126" y="525">场景顺序与切换条件</text>
+<line class="cl-l" x1="58" y1="540" x2="70" y2="540"/><text class="cl-t" x="76" y="544">全局状态</text><text class="cl-s" x="140" y="544">跨场景保留</text>
+<line class="cl-l" x1="58" y1="559" x2="70" y2="559"/><text class="cl-t" x="76" y="563">场景[]</text><text class="cl-s" x="126" y="563">→ 块[] → 实体[]（kind + 组件）</text>
+<line class="cl-l" x1="58" y1="578" x2="70" y2="578"/><text class="cl-t" x="76" y="582">事件表</text><text class="cl-s" x="126" y="582">规则行[] · 行为单元 · 配方</text>
+<line class="cl-l" x1="58" y1="597" x2="70" y2="597"/><text class="cl-t" x="76" y="601">数据表[]</text><text class="cl-s" x="140" y="601">作者编辑，静态，行 id 只增不改</text>
+<line class="cl-l" x1="58" y1="616" x2="70" y2="616"/><text class="cl-t" x="76" y="620">运行期集合[]</text><text class="cl-s" x="167" y="620">背包 · 队列 · 卡组</text>
+<line class="cl-l" x1="58" y1="635" x2="70" y2="635"/><text class="cl-t" x="76" y="639">kind 注册[]</text><text class="cl-s" x="158" y="639">碰撞体 · 占地 · 位移曲线</text>
+<line class="cl-l" x1="58" y1="654" x2="70" y2="654"/><text class="cl-t" x="76" y="658">当前皮肤包</text><text class="cl-s" x="158" y="658">kind → 视觉</text>
+<line class="cl-l" x1="58" y1="673" x2="70" y2="673"/><text class="cl-t" x="76" y="677">输入绑定表</text><text class="cl-s" x="158" y="677">意图 → 设备</text>
+<line class="cl-l" x1="58" y1="692" x2="70" y2="692"/><text class="cl-t" x="76" y="696">内容包依赖[]</text><text class="cl-s" x="167" y="696">包 id + 版本</text>
+
+<g class="cl-b"><rect x="392" y="490" width="248" height="88" rx="4"/></g>
+<text class="cl-tb" x="406" y="509">三种「状态固化」</text>
+<text class="cl-s" x="406" y="527">工程存档　　编辑期状态，权威 = Action 层</text>
+<text class="cl-s" x="406" y="544">导出工程文件　自包含，可发给别人继续改</text>
+<text class="cl-s" x="406" y="561">运行时存档　游戏声明存什么，含等待队列</text>
+<g class="cl-blue"><rect x="392" y="588" width="248" height="108" rx="4"/></g>
+<text class="cl-tb" x="406" y="607">可替换的东西都是一张映射表</text>
+<text class="cl-s" x="406" y="626">kind → 视觉　　　　　皮肤包</text>
+<text class="cl-s" x="406" y="643">动画语义状态 → clip　皮肤包</text>
+<text class="cl-s" x="406" y="660">输入意图 → 设备　　　绑定表</text>
+<text class="cl-s" x="406" y="677">包 id + 版本 → 内容　内容包</text>
+<text class="cl-s" x="406" y="691">Action 标签 → 能力面　registry 视图（留口）</text>
+
+<line class="cl-sep" x1="30" y1="722" x2="650" y2="722"/>
+
+<!-- ══════════ 3 · 一帧发生什么 ══════════ -->
+<text class="cl-n" x="30" y="754">3</text>
+<text class="cl-h" x="48" y="755">一帧发生什么 · 玩法与呈现分离</text>
+<text class="cl-s" x="48" y="772">确定性断言的范围限定在玩法状态，不含渲染与视听</text>
+
+<g class="cl-blue"><rect x="40" y="786" width="600" height="84" rx="4"/></g>
+<text class="cl-tb" x="56" y="805">固定步长 tick · 玩法 · 确定性范围</text>
+<rect class="cl-b" x="52" y="814" width="112" height="44" rx="3"/>
+<text class="cl-s" x="108" y="831" text-anchor="middle">1 采样输入意图</text><text class="cl-s" x="108" y="846" text-anchor="middle">冻结本 tick 快照</text>
+<rect class="cl-b" x="173" y="814" width="112" height="44" rx="3"/>
+<text class="cl-s" x="229" y="831" text-anchor="middle">2 物理步进</text><text class="cl-s" x="229" y="846" text-anchor="middle">Rapier</text>
+<rect class="cl-b" x="294" y="814" width="112" height="44" rx="3"/>
+<text class="cl-s" x="350" y="831" text-anchor="middle">3 排空触发队列</text><text class="cl-s" x="350" y="846" text-anchor="middle">FIFO · 深度 ≤ 16</text>
+<rect class="cl-b" x="415" y="814" width="112" height="44" rx="3"/>
+<text class="cl-s" x="471" y="831" text-anchor="middle">4 全表求值</text><text class="cl-s" x="471" y="846" text-anchor="middle">自上而下</text>
+<rect class="cl-b" x="536" y="814" width="92" height="44" rx="3"/>
+<text class="cl-s" x="582" y="831" text-anchor="middle">5 结算</text><text class="cl-s" x="582" y="846" text-anchor="middle">等待队列</text>
+
+<line class="cl-a" x1="340" y1="872" x2="340" y2="888" marker-end="url(#cl-ar)"/>
+<text class="cl-s" x="352" y="884">单向</text>
+
+<g class="cl-b"><rect x="40" y="890" width="600" height="66" rx="4"/></g>
+<text class="cl-tb" x="56" y="909">渲染帧 · 呈现 · 只读消费</text>
+<text class="cl-s" x="56" y="927">渲染桥增量同步 → 动画状态机求值 → 粒子 / 音频 / 后处理</text>
+<text class="cl-s" x="56" y="944">块的加载与卸载（呈现层事件，不是玩法事件，不影响模拟结果）</text>
+
+<text class="cl-s" x="40" y="976">保住确定性的四条：实体迭代按稳定 id 升序 · 随机数只来自注入的带种子 rng · JS 条件动作跑沙箱 · 触发在 tick 边界对齐</text>
+
+<line class="cl-sep" x1="30" y1="1000" x2="650" y2="1000"/>
+
+<!-- ══════════ 4 · 用户流程 ══════════ -->
+<text class="cl-n" x="30" y="1032">4</text>
+<text class="cl-h" x="48" y="1033">用户流程 · 八步与主循环</text>
+<text class="cl-s" x="48" y="1050">本轮终点是导出；分享 · 账号 · remix 回流在开放阶段</text>
+
+<g class="cl-teal"><rect x="40" y="1064" width="142" height="42" rx="4"/></g>
+<text class="cl-t" x="111" y="1082" text-anchor="middle">1 打开</text><text class="cl-s" x="111" y="1097" text-anchor="middle">模板库，不是空场景</text>
+<g class="cl-teal"><rect x="192" y="1064" width="142" height="42" rx="4"/></g>
+<text class="cl-t" x="263" y="1082" text-anchor="middle">2 先玩一局</text><text class="cl-s" x="263" y="1097" text-anchor="middle">建立目标感</text>
+<g class="cl-blue"><rect x="344" y="1064" width="142" height="42" rx="4"/></g>
+<text class="cl-t" x="415" y="1082" text-anchor="middle">3 改一个数</text><text class="cl-s" x="415" y="1097" text-anchor="middle">第一次正反馈</text>
+<g class="cl-blue"><rect x="496" y="1064" width="144" height="42" rx="4"/></g>
+<text class="cl-t" x="568" y="1082" text-anchor="middle">4 改玩法</text><text class="cl-s" x="568" y="1097" text-anchor="middle">事件表 · 配方</text>
+<line class="cl-a" x1="184" y1="1085" x2="190" y2="1085" marker-end="url(#cl-ar)"/>
+<line class="cl-a" x1="336" y1="1085" x2="342" y2="1085" marker-end="url(#cl-ar)"/>
+<line class="cl-a" x1="488" y1="1085" x2="494" y2="1085" marker-end="url(#cl-ar)"/>
+
+<g class="cl-blue"><rect x="40" y="1130" width="142" height="42" rx="4"/></g>
+<text class="cl-t" x="111" y="1148" text-anchor="middle">5 让 AI 帮忙</text><text class="cl-s" x="111" y="1163" text-anchor="middle">预览 · 接受 · 手改</text>
+<g class="cl-blue"><rect x="192" y="1130" width="142" height="42" rx="4"/></g>
+<text class="cl-t" x="263" y="1148" text-anchor="middle">6 换风格 / 视听</text><text class="cl-s" x="263" y="1163" text-anchor="middle">玩法定了才谈表达</text>
+<g class="cl-blue"><rect x="344" y="1130" width="142" height="42" rx="4"/></g>
+<text class="cl-t" x="415" y="1148" text-anchor="middle">7 检查与打磨</text><text class="cl-s" x="415" y="1163" text-anchor="middle">约束无红点 · AI 试玩</text>
+<g class="cl-teal"><rect x="496" y="1130" width="144" height="42" rx="4"/></g>
+<text class="cl-t" x="568" y="1148" text-anchor="middle">8 导出</text><text class="cl-s" x="568" y="1163" text-anchor="middle">自包含工程文件</text>
+<line class="cl-a" x1="184" y1="1151" x2="190" y2="1151" marker-end="url(#cl-ar)"/>
+<line class="cl-a" x1="336" y1="1151" x2="342" y2="1151" marker-end="url(#cl-ar)"/>
+<line class="cl-a" x1="488" y1="1151" x2="494" y2="1151" marker-end="url(#cl-ar)"/>
+<path class="cl-a" d="M568 1108 L568 1118 L111 1118 L111 1128" marker-end="url(#cl-ar)"/>
+
+<path class="cl-d" d="M415 1174 L415 1188 L340 1188" marker-end="url(#cl-ar)"/>
+<path class="cl-d" d="M340 1188 L20 1188 L20 1085 L36 1085" marker-end="url(#cl-ar)"/>
+<text class="cl-s" x="40" y="1206">主循环 · 3–7 步反复，不满意就撤销。从「改」到「看到结果」超过几秒，心流就断——循环的长度是产品质量的核心指标</text>
+
+<text class="cl-s" x="40" y="1224">内置教程贯穿全程：任何一步都能唤出，不挡在路上　·　全流程零账号，唯一按需触发项是 API key</text>
+
+<line class="cl-sep" x1="30" y1="1238" x2="650" y2="1238"/>
+
+<!-- ══════════ 5 · 编辑器界面 ══════════ -->
+<text class="cl-n" x="30" y="1270">5</text>
+<text class="cl-h" x="48" y="1271">编辑器界面 · 一套能力面</text>
+<text class="cl-s" x="48" y="1288">没有模式切换，没有术语翻译。每块面板改一样东西，全部经 Action 层</text>
+
+<rect class="cl-b" x="40" y="1302" width="600" height="212" rx="5"/>
+<line class="cl-l" x1="40" y1="1328" x2="640" y2="1328"/>
+<text class="cl-s" x="54" y="1320">Clay　　项目门厅 · 模板库　　　　　　　　　　　　　　▶ 播放 · 暂停 · 单步　　　导出</text>
+
+<g class="cl-b"><rect x="52" y="1340" width="112" height="106" rx="3"/></g>
+<text class="cl-t" x="108" y="1360" text-anchor="middle">大纲</text>
+<text class="cl-s" x="108" y="1377" text-anchor="middle">实体树</text>
+<text class="cl-s" x="108" y="1392" text-anchor="middle">用户文件夹</text>
+<g class="cl-b"><rect x="52" y="1454" width="112" height="48" rx="3"/></g>
+<text class="cl-t" x="108" y="1473" text-anchor="middle">资产库</text>
+<text class="cl-s" x="108" y="1489" text-anchor="middle">素材 · glTF · 预制体</text>
+
+<g class="cl-teal"><rect x="174" y="1340" width="308" height="162" rx="3"/></g>
+<text class="cl-t" x="328" y="1394" text-anchor="middle">视口</text>
+<text class="cl-s" x="328" y="1412" text-anchor="middle">gizmo · 多选框选 · 对齐吸附</text>
+<text class="cl-s" x="328" y="1428" text-anchor="middle">相机四档：受限俯视 / 肩后跟随 / 第一人称 / 自由飞行</text>
+
+<g class="cl-b"><rect x="492" y="1340" width="136" height="76" rx="3"/></g>
+<text class="cl-t" x="560" y="1360" text-anchor="middle">详情</text>
+<text class="cl-s" x="560" y="1377" text-anchor="middle">按 schema 生成</text>
+<text class="cl-s" x="560" y="1392" text-anchor="middle">可写</text>
+<g class="cl-blue"><rect x="492" y="1424" width="136" height="78" rx="3"/></g>
+<text class="cl-t" x="560" y="1444" text-anchor="middle">AI 面板</text>
+<text class="cl-s" x="560" y="1461" text-anchor="middle">单步指令</text>
+<text class="cl-s" x="560" y="1476" text-anchor="middle">变更集预览</text>
+<text class="cl-s" x="560" y="1491" text-anchor="middle">内联建议</text>
+
+<line class="cl-l" x1="40" y1="1514" x2="640" y2="1514"/>
+<g class="cl-blue"><rect x="40" y="1518" width="600" height="52" rx="4"/></g>
+<text class="cl-tb" x="56" y="1537">事件表　|　数据表　|　动画状态机　|　皮肤　|　教程</text>
+<text class="cl-s" x="56" y="1554">可拖拽列表：加规则行 · 挑条件动作 · 改参数 · 调顺序 · 分组；播放时高亮命中的行</text>
+<text class="cl-s" x="56" y="1566">没有画布、没有连线、没有布线算法</text>
+
+<line class="cl-sep" x1="30" y1="1596" x2="650" y2="1596"/>
+
+<!-- ══════════ 6 · 能力覆盖面 ══════════ -->
+<text class="cl-n" x="30" y="1628">6</text>
+<text class="cl-h" x="48" y="1629">能力覆盖面 · 三道闸与七款目标游戏</text>
+<text class="cl-s" x="48" y="1646">判定标准是灰盒 MVP：核心玩法循环能不能跑通，不是能不能做出那款成品</text>
+
+<g class="cl-warn"><rect x="40" y="1660" width="194" height="52" rx="4"/></g>
+<text class="cl-tb" x="137" y="1679" text-anchor="middle">动画闸</text>
+<text class="cl-s" x="137" y="1695" text-anchor="middle">档 2 封顶：无 IK · 无动作匹配</text>
+<text class="cl-s" x="137" y="1707" text-anchor="middle">挡掉跑酷 · 格斗 · 体育</text>
+<g class="cl-warn"><rect x="243" y="1660" width="194" height="52" rx="4"/></g>
+<text class="cl-tb" x="340" y="1679" text-anchor="middle">规模闸</text>
+<text class="cl-s" x="340" y="1695" text-anchor="middle">同屏完整模拟 1000 · 无 LOD</text>
+<text class="cl-s" x="340" y="1707" text-anchor="middle">挡掉千级弹幕 · 人群 · 体素</text>
+<g class="cl-warn"><rect x="446" y="1660" width="194" height="52" rx="4"/></g>
+<text class="cl-tb" x="543" y="1679" text-anchor="middle">网络闸</text>
+<text class="cl-s" x="543" y="1695" text-anchor="middle">本轮无联机 · 方向 lockstep</text>
+<text class="cl-s" x="543" y="1707" text-anchor="middle">挡掉竞技对抗 · MMO</text>
+
+<text class="cl-tb" x="40" y="1740">俯视指令簇</text>
+<g class="cl-blue"><rect x="128" y="1727" width="118" height="26" rx="3"/></g><text class="cl-s" x="187" y="1744" text-anchor="middle">红色警戒　✓</text>
+<g class="cl-blue"><rect x="254" y="1727" width="118" height="26" rx="3"/></g><text class="cl-s" x="313" y="1744" text-anchor="middle">星际争霸　✓ 小规模</text>
+<g class="cl-blue"><rect x="380" y="1727" width="118" height="26" rx="3"/></g><text class="cl-s" x="439" y="1744" text-anchor="middle">魔兽争霸　✓</text>
+<g class="cl-blue"><rect x="506" y="1727" width="134" height="26" rx="3"/></g><text class="cl-s" x="573" y="1744" text-anchor="middle">Dota 2　✓ 单人对 AI</text>
+
+<text class="cl-tb" x="40" y="1776">第三人称动作簇</text>
+<g class="cl-teal"><rect x="128" y="1763" width="118" height="26" rx="3"/></g><text class="cl-s" x="187" y="1780" text-anchor="middle">塞尔达　✓ 神庙式</text>
+<g class="cl-teal"><rect x="254" y="1763" width="118" height="26" rx="3"/></g><text class="cl-s" x="313" y="1780" text-anchor="middle">艾尔登　✓ Boss 房</text>
+<g class="cl-warn"><rect x="380" y="1763" width="118" height="26" rx="3"/></g><text class="cl-s" x="439" y="1780" text-anchor="middle">刺客信条　⚠ 降级</text>
+<g class="cl-teal"><rect x="506" y="1763" width="134" height="26" rx="3"/></g><text class="cl-s" x="573" y="1780" text-anchor="middle">第三人称射击　✓</text>
+
+<text class="cl-s" x="40" y="1812">刺客信条降级 = 潜入 + 战斗 + 沿预设点攀爬，没有丝滑跑酷（那要动画档 3，已封顶）</text>
+<text class="cl-s" x="40" y="1828">强项：RTS · MOBA · 塔防 · 战棋 · roguelite · 经营 · ARPG · 解谜　　中等：魂类 Boss 房 · 平台跳跃 · 复古 FPS　　弱项：移动本身即玩法的一类</text>
+</svg>
