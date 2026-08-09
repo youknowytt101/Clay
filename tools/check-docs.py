@@ -36,7 +36,7 @@ OVERTURNED = {
 
 # 已退役的术语。出现在「当前态」文档里即告警；带下列标记的行视为历史叙述，豁免。
 RETIRED_TERMS = ['术语层', '简易模式']
-HIST_MARKS = ['v15', 'v16', 'v17', 'v18', 'v19', 'v20', 'v21', '原文', '推翻', '取消', '已于', '曾', '改写']
+HIST_MARKS = ['v15', 'v16', 'v17', 'v18', 'v19', 'v20', 'v21', 'v22', '原文', '推翻', '取消', '已于', '曾', '改写']
 
 problems, notes = [], []
 
@@ -258,14 +258,14 @@ for name in ('docs/design/architecture-outline.md', 'docs/design/roadmap.md',
         if any(all(part in line for part in pattern) for pattern in legacy_patterns):
             problems.append('[旧 AI 当前态] %s:%d: %s' % (name, i, line.strip()[:90]))
 
-# ---- 14. v21 决策治理协议投影 ---------------------------------------------
+# ---- 14. v21/v22 决策治理协议投影 -----------------------------------------
 governance_targets = {
-    'docs/design/adr-004-evidence-governed-evolution.md': ('TaskContract', 'DecisionChallenge', 'EvolutionProposal', '## 14. 最小执行模板'),
-    'docs/design/architecture-outline.md': ('TaskContract', 'DecisionChallenge', 'champion/challenger'),
-    'docs/design/roadmap.md': ('adr-004-evidence-governed-evolution.md', 'M0-d 决策治理准入', '治理准入 G0'),
-    'docs/design/ai-native-engine.md': ('## 研发治理 · Discover-Challenge-Evolve', 'DecisionCoverage', 'champion'),
-    'README.md': ('ADR-004', 'DecisionCoverage'),
-    'AGENTS.md': ('TaskContract', 'DecisionChallenge', 'evidence package'),
+    'docs/design/adr-004-evidence-governed-evolution.md': ('TaskContract', 'DecisionChallenge', 'EvolutionProposal', '## 14. 最小执行模板', 'any` / `all` / `none'),
+    'docs/design/architecture-outline.md': ('TaskContract', 'DecisionChallenge', 'champion/challenger', '分支实体集传播'),
+    'docs/design/roadmap.md': ('adr-004-evidence-governed-evolution.md', 'M0-d 决策治理准入', '治理准入 G0', 'G2 r2'),
+    'docs/design/ai-native-engine.md': ('## 研发治理 · Discover-Challenge-Evolve', 'DecisionCoverage', 'champion', '短路'),
+    'README.md': ('ADR-004', 'DecisionCoverage', '不增加普适 D13'),
+    'AGENTS.md': ('TaskContract', 'DecisionChallenge', 'evidence package', '条件式逻辑探针'),
 }
 for name, needles in governance_targets.items():
     p = os.path.join(BASE, *name.split('/'))

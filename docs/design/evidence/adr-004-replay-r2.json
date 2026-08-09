@@ -1,0 +1,73 @@
+{
+  "schema": "clay.governance-replay/1",
+  "date": "2026-08-09",
+  "isolatedContext": true,
+  "readOnly": true,
+  "challenger": {
+    "name": "conditional-logic-probe",
+    "scope": "rule-expression-state-machine-only",
+    "universalD13": false,
+    "probeGroups": [
+      "and-or-not",
+      "any-all-none",
+      "short-circuit-and-side-effects",
+      "operator-precedence",
+      "branch-entity-set-visibility-and-propagation"
+    ]
+  },
+  "g2": {
+    "planted": [
+      "per-source-object-association",
+      "equal-distance-tie-break",
+      "destroyed-entity-visibility",
+      "or-composition-semantics",
+      "stable-event-order",
+      "numeric-precision"
+    ],
+    "discovered": [
+      "per-source-object-association",
+      "equal-distance-tie-break",
+      "destroyed-entity-visibility",
+      "or-composition-semantics",
+      "stable-event-order",
+      "numeric-precision"
+    ],
+    "missed": [],
+    "previouslyMissedDiscovered": ["or-composition-semantics"],
+    "unauthorizedChanges": 0,
+    "result": "passed"
+  },
+  "controls": [
+    {
+      "task": "readme-typo-fix",
+      "applicable": false,
+      "invalidChallenges": 0
+    },
+    {
+      "task": "test-existing-stable-sort-helper",
+      "applicable": false,
+      "invalidChallenges": 0
+    },
+    {
+      "task": "rename-unexported-local-variable",
+      "applicable": false,
+      "invalidChallenges": 0
+    }
+  ],
+  "burden": {
+    "fixtureCount": 4,
+    "applicabilityChecks": 4,
+    "probeGroupChecks": 5,
+    "addedReviewJudgments": 9,
+    "addedExperimentsOnControls": 0,
+    "addedChallengesOnControls": 0
+  },
+  "adoption": {
+    "ownerApproved": true,
+    "decision": "adopt-conditional-probe",
+    "adrState": "verified-not-frozen",
+    "closedUncertainties": ["U-032", "U-047"]
+  },
+  "limitation": "The challenger instructions necessarily name the logic categories; this replay validates triggered inspection and decidable micro-cases, not category-blind discovery.",
+  "overall": "passed-g2-r2-conditional-logic-probe"
+}
