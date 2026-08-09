@@ -175,8 +175,9 @@ python tools/build-preview.py
 | ✅ **M1-g 分块与流式加载** | 稳定空间块策略 + Transform 世界坐标块解析 + RenderBridge 投影过滤；权威玩法世界常驻，卸载只移除表现与拾取索引；4 项测试覆盖 S1–S3 与跨块事务。`U-024` 参数调优仍活动 |
 | ✅ **M1-h 编辑器改造** | ECS 大纲 + schema 详情 + 点选 / 多选 / 拖框 + 三模式 gizmo + 桌面三栏工作台；所有持久编辑统一走 Action 事务；6 项测试覆盖 GUI 对拍、批量回滚、选择隔离、世界重绑定、层级环拒绝与父子变换 |
 | ✅ **M1-i 最小 AI 单步指令** | 供应商无关解释器边界 + Action allowlist + 宿主影响域授权 + 真实 diff 预览 + 显式确认 / 取消；重复 request id 不重复解释或执行；4 项测试含越权负例 |
+| ✅ **M1-j 确定性沙箱 J1–J3** | 条件 / 动作脚本注册时静态拒绝环境时间 / 随机、网络、存储、DOM 与动态代码；执行时只注入带种子 `rng`、`tick`、`dt` 和隔离 JSON；6 项测试含确定性与静态拒绝负例。`U-011` 仍活动 |
 
-- **下一步**：**M1-j 确定性沙箱 J1–J3**，随后补 Rapier / Transform 跨 CPU 架构实测和 ADR-004 治理回放。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
+- **下一步**：补 **Rapier / Transform 跨 CPU 架构实测**，随后做 ADR-004 治理回放。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
 
 > **不要往设计文档里加新范围。** 决策密度仍然超前于实现进度。
 >

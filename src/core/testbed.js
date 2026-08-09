@@ -2,6 +2,7 @@ import {
   createWorldEnvelope,
   loadWorldEnvelope,
 } from './serialization.js';
+import { createDeterministicRng } from './rng.js';
 
 const STABLE_ID = /^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/;
 const TEST_KINDS = new Set(['schema', 'constraint', 'state', 'interaction', 'visual']);
@@ -189,21 +190,6 @@ export function createOracleRegistry() {
   return new OracleRegistry();
 }
 
-function createRng(seed) {
-  let state = seed >>> 0;
-  function uint32() {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let value = state;
-    value = Math.imul(value ^ (value >>> 15), value | 1);
-    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
-    return (value ^ (value >>> 14)) >>> 0;
-  }
-  return Object.freeze({
-    uint32,
-    next: () => uint32() / 0x100000000,
-  });
-}
-
 function testbedError(code, message) {
   const error = new Error(message);
   error.code = code;
@@ -261,7 +247,7 @@ class HeadlessTestbed {
       chunkForEntity: (entity) => originalChunks.get(entity.id) ?? chunkForEntity(entity),
       chunkPayloads: loaded.chunkPayloads,
     };
-    const rng = createRng(spec.seed);
+    const rng = createDeterministicRng(spec.seed);
     const logs = [];
     let tick = -1;
     let oracleEvidence;

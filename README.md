@@ -3,10 +3,10 @@
 > **一个 AI 与人共用同一条编辑通道的通用 3D 网页游戏引擎编辑器：
 > 游戏逻辑是数据，AI 和鼠标是同一个命令层的两个前端，产出的是同一种材料。**
 
-**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f / M1-g / M1-h / M1-i 已落地。**
+**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f / M1-g / M1-h / M1-i / M1-j 已落地。**
 
 ```bash
-npm install && npm test        # headless 断言（64 项）
+npm install && npm test        # headless 断言（70 项）
 npm run dev                    # 编辑器：大纲 / 详情 / gizmo / 多选 / 分块流式 / AI 单步预览
 ```
 
@@ -184,7 +184,7 @@ python tools/build-preview.py
 | ⚠️ **物理确定性**（决策 29） | [spike-001](docs/design/spike-001-rapier-determinism.md)——同机与跨 V8 版本通过；**跨 CPU 架构未验**（需第二台机器，截止点闸门 A） |
 | ⬜ **决策治理回放**（决策 42） | [ADR-004](docs/design/adr-004-evidence-governed-evolution.md) G1–G3 未做。横切约束，**不阻塞 M1** |
 
-### M1-a / M1-b / M1-c / M1-d / M1-f / M1-g / M1-h / M1-i 已完成；下一步是 M1-j
+### M1-a / M1-b / M1-c / M1-d / M1-f / M1-g / M1-h / M1-i / M1-j 已完成；下一步是闸门 A 跨架构实测
 
 **M1-a ECS 封装层**已经提供稳定实体 id、按 id 升序的 `query()`、声明式组件 schema、
 连续版本迁移与结构化诊断；生产代码只在适配层导入 koota。9 项 M1-a 测试含 koota 原始错序与半写负例，
@@ -220,7 +220,11 @@ translate / rotate / scale gizmo、轨道相机与桌面三栏工作台。编辑
 权威 ECS 世界始终常驻，块卸载只移除 Object3D 和拾取索引；跨块 Action 的真实 diff 会包含 `/chunk`，父级移动也会声明后代块影响。
 4 项测试覆盖 S1–S3、负坐标、加载顺序、卸载重载确定性与跨块事务。`U-024` 仍活动：块大小、预加载圈和卸载延迟要在 RTS / 动作两类场景实测后冻结。
 
-下一步做 **M1-j 确定性沙箱 J1–J3**，随后完成 Rapier / Transform 跨 CPU 架构实测和 ADR-004 治理回放。
+**M1-j** 已提供条件 / 动作共用的确定性脚本注册表：注册时静态拒绝时间、环境随机、网络、存储、DOM、动态代码与常见宿主逃逸入口；
+运行时只注入带种子 `rng`、`tick`、`dt` 以及隔离冻结的 JSON 输入 / 状态，输出归一为确定性 JSON。6 项测试覆盖 J1–J3、静态扫描误报边界、
+确定性负例、输入隔离和 condition / action 返回契约；`U-011` 仍活动，注册责任与事件表集成形状留到 M2-3 决定。
+
+下一步完成 **Rapier / Transform 跨 CPU 架构实测**，随后做 ADR-004 治理回放。
 
 完整的包拆分、依赖、砍单顺序见 [roadmap.md](docs/design/roadmap.md) M1。
 
