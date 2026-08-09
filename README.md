@@ -3,11 +3,11 @@
 > **一个 AI 与人共用同一条编辑通道的通用 3D 网页游戏引擎编辑器：
 > 游戏逻辑是数据，AI 和鼠标是同一个命令层的两个前端，产出的是同一种材料。**
 
-**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f / M1-h 已落地。**
+**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f / M1-h / M1-i 已落地。**
 
 ```bash
-npm install && npm test        # headless 断言（56 项）
-npm run dev                    # 第一版编辑器：大纲 / 详情 / gizmo / 多选
+npm install && npm test        # headless 断言（60 项）
+npm run dev                    # 编辑器：大纲 / 详情 / gizmo / 多选 / AI 单步预览
 ```
 
 [ADR-002](docs/design/adr-002-eventsheet-eval.md)（事件表求值语义，全项目唯一不可逆项）
@@ -167,7 +167,7 @@ python tools/build-preview.py
 | ⚠️ **物理确定性**（决策 29） | [spike-001](docs/design/spike-001-rapier-determinism.md)——同机与跨 V8 版本通过；**跨 CPU 架构未验**（需第二台机器，截止点闸门 A） |
 | ⬜ **决策治理回放**（决策 42） | [ADR-004](docs/design/adr-004-evidence-governed-evolution.md) G1–G3 未做。横切约束，**不阻塞 M1** |
 
-### M1-a / M1-b / M1-c / M1-d / M1-f / M1-h 已完成；下一步是 M1-i
+### M1-a / M1-b / M1-c / M1-d / M1-f / M1-h / M1-i 已完成；下一步是 M1-g
 
 **M1-a ECS 封装层**已经提供稳定实体 id、按 id 升序的 `query()`、声明式组件 schema、
 连续版本迁移与结构化诊断；生产代码只在适配层导入 koota。9 项 M1-a 测试含 koota 原始错序与半写负例，
@@ -195,7 +195,11 @@ translate / rotate / scale gizmo、轨道相机与桌面三栏工作台。编辑
 属性输入与 gizmo 松手统一提交 `editor.patch-components` Action，并共享现有 revision、checkpoint 与撤销栈。
 6 项 M1-h 测试覆盖 GUI / Action revision 对拍、批量回滚、选择隔离、世界替换重绑定、层级环拒绝与父子 gizmo 补丁。
 
-下一步做 **M1-i 最小 AI 单步指令**，验证模型与人能否复用同一条 Action 通道和事务回执；随后进入 M1-g 分块流式加载。
+**M1-i** 已接通供应商无关的单步指令边界：解释器只能从宿主 allowlist 提议一条 Action，影响域由宿主授权，
+候选显示真实 diff 后必须显式确认或取消；重复 request id 复用同一提案与回执，不会再次解释或执行。
+桌面编辑器内置一个确定性本地适配器用于通道验收，可对当前选择设置 X / Y / Z 位置或重命名；4 项测试覆盖隔离预览、确认 / 取消、幂等与越权负例。
+
+下一步做 **M1-g 分块流式加载**，随后进入 M1-j 确定性沙箱 J1–J3。
 
 完整的包拆分、依赖、砍单顺序见 [roadmap.md](docs/design/roadmap.md) M1。
 

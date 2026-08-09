@@ -16,7 +16,11 @@
         <button class="icon-button mode-button" data-mode="scale" title="缩放 (R)" aria-label="缩放">S</button>
       </div>
       <button id="undo" class="icon-button" title="撤销 (Ctrl+Z)" aria-label="撤销">↶</button>
-      <div class="topbar-spacer"></div>
+      <form id="ai-command-form" class="ai-command-form">
+        <label class="visually-hidden" for="ai-instruction">AI 单步指令</label>
+        <input id="ai-instruction" type="text" autocomplete="off" placeholder="把选中物体的 X 位置设为 3" aria-label="AI 单步指令">
+        <button id="ai-preview" type="submit">预览</button>
+      </form>
     </header>
     <main class="workspace">
       <aside class="panel outline-panel">
@@ -29,6 +33,17 @@
       <section id="viewport" class="viewport-panel" aria-label="三维视口">
         <div class="viewport-label">透视 · 编辑</div>
         <div class="viewport-axis"><b>X</b><b>Y</b><b>Z</b></div>
+        <section id="ai-preview-panel" class="ai-preview-panel" aria-live="polite" hidden>
+          <div class="ai-preview-heading">
+            <strong id="ai-preview-instruction"></strong>
+            <span id="ai-preview-meta"></span>
+          </div>
+          <ul id="ai-preview-diff" class="ai-preview-diff"></ul>
+          <div class="ai-preview-actions">
+            <button id="ai-abort" type="button">取消</button>
+            <button id="ai-confirm" class="primary-button" type="button">确认更改</button>
+          </div>
+        </section>
       </section>
       <aside class="panel inspector-panel">
         <div class="panel-title">详情 <span>Schema</span></div>

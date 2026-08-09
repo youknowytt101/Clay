@@ -420,6 +420,8 @@ export function createEditorWorkbench({
   });
 
   addEventListener('keydown', (event) => {
+    if (event.target instanceof HTMLElement
+      && event.target.matches('input, select, textarea, [contenteditable="true"]')) return;
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
       event.preventDefault();
       undoButton.click();

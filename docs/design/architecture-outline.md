@@ -475,15 +475,16 @@
 
 ## 十二 · 当前进度与下一步
 
-**状态：M1 进行中。** M1-a / M1-b / M1-c / M1-d / M1-f / M1-h 已落地：生产代码只在适配层导入 koota，实体使用单调稳定 id，
+**状态：M1 进行中。** M1-a / M1-b / M1-c / M1-d / M1-f / M1-h / M1-i 已落地：生产代码只在适配层导入 koota，实体使用单调稳定 id，
 `query()` 按 id 升序；组件 schema 带版本与迁移；世界快照使用确定性分块信封、SHA-256 revision、
 精确运行时版本注册表和命名 checkpoint；Action 层提供结构化 registry、自省、稳定语义 `affects`、真实 diff、
 preview / commit / abort、幂等、revision 冲突、checkpoint、日志与撤销；试飞台提供 TestSpec / oracle registry、
 固定 seed、两层输入适配、隔离沙箱、hard / soft 判定、确定性证据与 Action validator；渲染桥提供可序列化 ECS Transform
 层级、稳定网格索引、实体射线拾取，以及 ECS → Three.js 的增量只读投影；编辑器提供 ECS 父子大纲、schema 自动详情、
-点选 / 多选 / 拖框、三模式 gizmo 与桌面三栏工作台，属性和 gizmo 编辑统一进入 Action 事务与同一撤销栈。
-`npm test` 有 56 项 headless 断言；`U-002`、`U-039`、`U-041`、`U-042` 已关闭；`U-043` / `U-044` 仍活动。
-待做：M1-i、M1-g、ADR-004 三个治理回放、Rapier 跨 CPU 架构实测。
+点选 / 多选 / 拖框、三模式 gizmo 与桌面三栏工作台，属性和 gizmo 编辑统一进入 Action 事务与同一撤销栈；
+最小 AI 以供应商无关解释器提出一条 allowlist Action，由宿主授权影响域，显示真实 diff 后显式确认 / 取消，并复用事务幂等回执。
+`npm test` 有 60 项 headless 断言；`U-002`、`U-039`、`U-041`、`U-042` 已关闭；`U-043` / `U-044` 仍活动。
+待做：M1-g、M1-j、ADR-004 三个治理回放、Rapier 跨 CPU 架构实测。
 
 | 阶段 | 内容 | 闸门 |
 |---|---|---|
@@ -495,13 +496,12 @@ preview / commit / abort、幂等、revision 冲突、checkpoint、日志与撤�
 | 四 | 开放：分享 + 账号 + 移动端 + 新手视图 | E、G |
 | 五 | 联机（lockstep） | — |
 
-**眼下五件事**：
+**后续施工顺序**：
 
-1. **M1-i 最小 AI 单步指令**——验证 Action 通道形状与重复请求幂等
-2. **M1-g 分块流式加载**——在 M1-f 空间索引与投影基础上实现加载 / 卸载 / 重进
-3. **M1-j 确定性沙箱 J1–J3**——封住条件动作中的不确定时间、随机与外部副作用
-4. **Rapier 跨 CPU 架构实测**——闸门 A 前完成，不通过就换物理库
-5. **ADR-004 治理回放**——横切约束，不阻塞上述可逆工作
+1. **M1-g 分块流式加载**——在 M1-f 空间索引与投影基础上实现加载 / 卸载 / 重进
+2. **M1-j 确定性沙箱 J1–J3**——封住条件动作中的不确定时间、随机与外部副作用
+3. **Rapier 跨 CPU 架构实测**——闸门 A 前完成，不通过就换物理库
+4. **ADR-004 治理回放**——横切约束，不阻塞上述可逆工作
 
 > 溯源：goals.md §6
 

@@ -1,9 +1,10 @@
 /**
- * M1-h editor vertical slice: outline, schema details, gizmo and multi-select.
+ * M1-h/i editor vertical slice: ECS editing plus one provider-neutral AI Action preview.
  * Every persistent edit goes through the same Action transaction channel used by AI.
  */
 import * as THREE from 'three';
 import './editor/editor.css';
+import { createSingleStepAssistant } from './ai/single-step.js';
 import { createActionEngine, createActionRegistry } from './core/actions.js';
 import { createWorld } from './core/ecs.js';
 import { PHYSICS_RUNTIME_REQUIREMENT } from './core/runtime-versions.js';
@@ -11,7 +12,8 @@ import { createRuntimeRegistry } from './core/serialization.js';
 import { createGridSpatialIndex } from './core/spatial-index.js';
 import { Transform } from './core/transform.js';
 import { EditorTag, Name } from './editor/components.js';
-import { createEditorPatchAction, createEditorSession } from './editor/session.js';
+import { createEditorPatchAction, createEditorSession, EDITOR_PATCH_ACTION } from './editor/session.js';
+import { authorizeEditorSingleStep, interpretEditorSingleStep } from './editor/single-step-command.js';
 import { createEditorWorkbench } from './editor/workbench.js';
 import { createRenderBridge } from './render/bridge.js';
 
@@ -118,6 +120,13 @@ function syncAppearance() {
   }
 }
 session.subscribe(syncAppearance);
+const assistant = createSingleStepAssistant({
+  engine,
+  registry,
+  allowedActions: [EDITOR_PATCH_ACTION],
+  interpret: interpretEditorSingleStep,
+  authorize: authorizeEditorSingleStep,
+});
 const workbench = createEditorWorkbench({
   session,
   bridge,
@@ -131,6 +140,115 @@ const workbench = createEditorWorkbench({
   statusMount: document.getElementById('editor-status'),
   undoButton: document.getElementById('undo'),
   modeButtons: [...document.querySelectorAll('.mode-button')],
+});
+
+const aiForm = document.getElementById('ai-command-form');
+const aiInput = document.getElementById('ai-instruction');
+const aiSubmit = document.getElementById('ai-preview');
+const aiPanel = document.getElementById('ai-preview-panel');
+const aiInstruction = document.getElementById('ai-preview-instruction');
+const aiMeta = document.getElementById('ai-preview-meta');
+const aiDiff = document.getElementById('ai-preview-diff');
+const aiConfirm = document.getElementById('ai-confirm');
+const aiAbort = document.getElementById('ai-abort');
+let aiSequence = 0;
+let activeProposal = null;
+
+function concise(value) {
+  if (value === null) return '无';
+  if (typeof value === 'string') return `“${value}”`;
+  return JSON.stringify(value);
+}
+
+function diffLabel(change) {
+  const parts = change.path.split('/');
+  const entity = parts[2] ? `#${parts[2]}` : '工程';
+  const field = parts.at(-1);
+  return `${entity} · ${field}: ${concise(change.before)} → ${concise(change.after)}`;
+}
+
+function setAiControls({ busy = false, pending = false } = {}) {
+  aiInput.disabled = busy || pending;
+  aiSubmit.disabled = busy || pending;
+  aiConfirm.disabled = busy || !pending;
+  aiAbort.disabled = busy || !pending;
+}
+
+function showProposal(proposal) {
+  const actionReceipt = proposal.receipt.actions[0];
+  aiPanel.hidden = false;
+  aiPanel.dataset.phase = proposal.phase;
+  aiInstruction.textContent = proposal.instruction;
+  aiMeta.textContent = `1 个 Action · ${actionReceipt.diff.length} 项变更 · ${proposal.phase === 'committed' ? '已提交' : '待确认'}`;
+  aiDiff.replaceChildren(...actionReceipt.diff.slice(0, 8).map((change) => {
+    const item = document.createElement('li');
+    item.textContent = diffLabel(change);
+    return item;
+  }));
+}
+
+function showAiError(error) {
+  const status = document.getElementById('editor-status');
+  status.dataset.tone = 'error';
+  status.textContent = error.message;
+}
+
+aiForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const instruction = aiInput.value.trim();
+  if (!instruction) return;
+  setAiControls({ busy: true });
+  try {
+    activeProposal = await assistant.propose({
+      requestId: `editor-ai-${++aiSequence}`,
+      instruction,
+      context: { selection: session.selection },
+    });
+    if (activeProposal.phase !== 'awaiting-confirmation') {
+      throw new Error(activeProposal.receipt.failure?.message ?? '无法生成候选变更');
+    }
+    showProposal(activeProposal);
+    setAiControls({ pending: true });
+  } catch (error) {
+    activeProposal = null;
+    showAiError(error);
+    setAiControls();
+  }
+});
+
+aiConfirm.addEventListener('click', async () => {
+  if (!activeProposal) return;
+  setAiControls({ busy: true });
+  try {
+    await assistant.confirm(activeProposal);
+    bridge.setWorld(engine.world);
+    bridge.sync();
+    session.setSelection(session.selection);
+    syncAppearance();
+    showProposal(activeProposal);
+    aiInput.value = '';
+    activeProposal = null;
+    setAiControls();
+    aiInput.focus();
+  } catch (error) {
+    showAiError(error);
+    setAiControls({ pending: true });
+  }
+});
+
+aiAbort.addEventListener('click', async () => {
+  if (!activeProposal) return;
+  setAiControls({ busy: true });
+  try {
+    await assistant.abort(activeProposal);
+    activeProposal = null;
+    aiPanel.hidden = true;
+    setAiControls();
+    aiInput.focus();
+  } catch (error) {
+    showAiError(error);
+    setAiControls({ pending: true });
+  }
 });
 
 document.getElementById('entity-count').textContent = `${engine.world.query().length} 项`;
