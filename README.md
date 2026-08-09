@@ -71,10 +71,24 @@ Clay/
 ├─ AGENTS.md              AI 协作规范（单一真源）：接手指引 · 七步迭代流程 · 检查表
 ├─ CLAUDE.md              指向 AGENTS.md 的 stub
 ├─ preview.html           全部文档合成的单页预览（生成物，勿手改）
+├─ package.json           依赖锁精确版本（理由见文件内 "//" 字段）
+├─ index.html             编辑器入口
+├─ vite.config.js
+├─ src/
+│  ├─ core/               ECS 封装 · Action 事务 · 序列化 / checkpoint ·
+│  │                      Transform · 空间索引 · 试飞台 · 运行时版本
+│  ├─ sim/                玩法世界骨架（零 three 依赖，I7）
+│  ├─ render/             ECS → three.js 的增量只读投影
+│  ├─ editor/             大纲 · schema 详情 · gizmo · 多选 · AI 单步入口
+│  ├─ ai/                 供应商无关的单步指令通道
+│  └─ main.js             浏览器入口
+├─ tests/                 headless 断言；@covers 标记喂给 status.py
 ├─ tools/
-│  ├─ check-docs.py       文档一致性校验
+│  ├─ check-docs.py       文档一致性校验（19 项）
+│  ├─ status.py           进度报告（npm run status，从真源派生）
 │  ├─ build-preview.py    重新生成 preview.html
-│  └─ preview-template.html
+│  ├─ preview-template.html
+│  └─ spikes/             一次性验证脚本（Rapier 确定性 · ECS 选型）
 └─ docs/
    ├─ design/             未来方案、取舍、决策记录（会过期）
    │  ├─ goals.md              产品设计大纲 —— 最高裁决依据（决策过程）
@@ -107,9 +121,12 @@ Clay/
 `conventions/` 很少变，变了要在决策表或 ADR 里留痕；
 `architecture/` 跟着代码改，代码变了文档没变就是 bug。
 
-**当前绝大部分内容仍在 `design/`**，代码只有 M0-b 的工程地基（`src/` + `tests/`）。
 `architecture/` 与 `conventions/` 里现有的两份是从 GameHub 继承的存量参考。
-**M1 落地后，实现过的部分要从 `design/` 挪进 `architecture/`**——这是三类文档分工的执行点。
+
+**`architecture/` 现在是空的，而 M1 已落地 7 个包**——这是三类文档分工的一处待还债务：
+内核、Action 事务、序列化、试飞台、渲染桥、编辑器、AI 通道都还只有 `design/` 里的
+「将来要怎么做」，没有 `architecture/` 里的「现在是怎么做的」。
+**M1 收尾时要补**，否则「代码变了文档没变就是 bug」这条规则无处落地。
 
 ---
 
