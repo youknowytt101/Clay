@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **状态** | **部分完成** —— 同机重跑通过；**跨机 / 跨平台未验**，[U-025](goals.md#九--未决项) 仍为 `testing` |
+| **状态** | **部分完成** —— 同机重跑通过；**跨机 / 跨平台未验**，`U-025` / `U-046` 仍活动 |
 | **日期** | 2026-08-08 |
-| **上游** | [goals.md](goals.md) 决策 29、`U-025`；[roadmap.md](roadmap.md) M1-e |
+| **上游** | [goals.md](goals.md) 决策 29、`U-025`、`U-046`；[roadmap.md](roadmap.md) M1-e |
 | **脚本** | [`tools/spikes/rapier-determinism.mjs`](../../tools/spikes/rapier-determinism.mjs) |
 
 ---
@@ -22,7 +22,8 @@ roadmap 原本把 M1-e 排在 M1 的第一件事，理由是依赖 M0-b 打包�
 ## 1. 复现
 
 ```bash
-npm i @dimforge/rapier3d-compat && node tools/spikes/rapier-determinism.mjs
+npm install
+npm run spike:gate-a -- --emit gate-a-x64.json
 ```
 
 场景：地面 + 50 个盒子（5×5×2 网格，两层错位堆叠），固定步长 1/60，跑 600 步。
@@ -34,6 +35,7 @@ npm i @dimforge/rapier3d-compat && node tools/spikes/rapier-determinism.mjs
 |---|---|---|
 | **状态** | 全部刚体的 `translation` + `rotation`，**精确位模式，不量化** | 量化会掩盖真实的跨平台漂移 |
 | **事件** | `drainCollisionEvents` 交回的接触事件，**按原始顺序，不排序** | [ADR-002 推演缺口 D](adr-002-walkthrough.md#24-推演换一台机器--撞上缺口-d最严重) 新增的验收内容 |
+| **Transform** | 四层非均匀缩放 / 旋转层级的 world position / quaternion / scale，**精确 f64 位模式** | `U-046`：验证 three.js `decompose()` 的结果是否跨 CPU 架构一致 |
 
 > **事件序列这一半是这次新加的。** 原验收只写"逐帧状态一致"，
 > 而 ADR-002 的推演表明：**事件顺序不一致同样会让作品分叉**，且它不体现在刚体状态里。
@@ -53,6 +55,7 @@ Rapier spike · 600 steps @ 0.01667s
 跨机器比对指纹：
   state = 85cff7f8f866e20f
   event = 3f0480a84fcddd29
+  transform = d7f8d8b3699f8168
 ```
 
 ### 2.1 指纹有效性（植入负例）
@@ -156,8 +159,9 @@ Rapier 是 f32 这件事，goals.md 与 adr-001 都没写过。它有两面：
 
 ## 5. 下一步
 
-1. **在第二台机器 / 另一 OS / ARM 上跑同一脚本**，比对 §2 的两个指纹。
-   脚本已支持 `--emit` 写出 `fingerprint.json` 供比对
+1. **在第二台机器 / 另一 OS / ARM 上跑同一脚本**，比对 §2 的三个指纹。
+   脚本已支持 `--emit <path>` 写出带平台、精确依赖版本、源码哈希与三项指纹的证据 JSON；把第一台机器的文件带到第二台后运行
+   `npm run spike:gate-a -- --compare gate-a-x64.json --emit gate-a-arm64.json`，工具会自动忽略预期不同的平台元数据，严格比较场景 / 依赖与指纹
 2. 若跨平台不一致 → 按决策 29**换物理库，不放宽判据**；
    若只是事件顺序不一致而状态一致 → [ADR-002 缺口 D](adr-002-walkthrough.md) 的稳定排序层可以救，属于可修复
 3. 补测：Rapier 版本升级前后、浏览器 wasm vs node wasm
@@ -166,10 +170,10 @@ Rapier 是 f32 这件事，goals.md 与 adr-001 都没写过。它有两面：
 
 ## 6. Evidence package
 
-- **已完成**：同机双 world 一致性 + 指纹有效性负例扫描
-- **未完成**：跨机 / 跨平台 / 跨版本 / 跨运行时，全部未验
-- **真实改动**：新增本文与 `tools/spikes/rapier-determinism.mjs`；[goals.md §9](goals.md#九--未决项) 的 `U-025` 证据栏更新
-- **复现命令**：`npm i @dimforge/rapier3d-compat && node tools/spikes/rapier-determinism.mjs`
+- **已完成**：同机双 world 一致性 + 指纹有效性负例扫描；跨机器证据已合并 Rapier 状态 / 事件与 `U-046` Transform 位模式，并支持自动比较
+- **未完成**：跨机 / 跨平台 / 跨运行时未验；跨 Rapier 版本一致性已证伪
+- **真实改动**：扩展 `tools/spikes/rapier-determinism.mjs` 与本文，加入 `U-046`、统一证据 JSON 和自动比较；不改变 `U-025` / `U-046` 的活动状态
+- **复现命令**：`npm install && npm run spike:gate-a -- --emit gate-a-x64.json`
 - **原始输出**：见 §2（本机 win32 x64 / node v24.16.0）
 - **失败与限制**：**只有一台机器**，最关键的跨平台一致性无法在本轮验证；
   第一轮负例（`1e-12`）因 f32 精度被吞而误判为"指纹失效"，已通过量级扫描定位并修正

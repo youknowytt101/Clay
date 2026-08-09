@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "test": "node --test tests/**/*.test.mjs",
     "spike:rapier": "node tools/spikes/rapier-determinism.mjs",
+    "spike:gate-a": "node tools/spikes/rapier-determinism.mjs",
     "check:docs": "python tools/check-docs.py",
     "build:preview": "python tools/build-preview.py",
     "status": "python tools/status.py"
