@@ -2,7 +2,15 @@
 
 **这是本仓库对所有 AI 助手的单一真源。** 任何模型接手前先读完这一份。
 
-**这是一个设计阶段的文档仓库，尚无代码。** 内容是 Markdown + 一张 SVG + 一份生成的预览页。
+**这个仓库现在既有设计文档，也有代码。** M0-b 已完成：`npm install` 后
+`npm test`（headless 玩法层断言）与 `npm run build`（vite）都能跑。
+
+```bash
+npm install && npm test
+```
+
+代码在 `src/`，测试在 `tests/`，spike 在 `tools/spikes/`。
+**文档仍是权威**——代码要服从 `docs/design/` 的决策，不是反过来。
 
 ---
 
@@ -16,11 +24,21 @@
 | 能做什么 | [`docs/design/architecture-outline.md`](docs/design/architecture-outline.md) **§二 能力覆盖面**——八款目标游戏的灰盒判定 + 三道闸 |
 | 现在在哪 | [`docs/design/roadmap.md`](docs/design/roadmap.md) + `git log --oneline` |
 
-接手第一件事，先确认仓库是干净的：
+接手第一件事，跑这三条确认仓库是干净的、并看清现在到哪了：
 
+```bash
+npm install && npm test
+```
 ```bash
 python tools/check-docs.py
 ```
+```bash
+npm run status
+```
+
+**`npm run status` 是接手时最有信息量的一条。** 它从既有真源自动派生进度——
+ADR 状态、哪些不变量有测试守着、未决项按截止里程碑排序、每个包的验收证据。
+**它不读任何手工维护的进度文档**，所以不会骗你。
 
 ---
 
@@ -35,12 +53,18 @@ python tools/check-docs.py
 | 3 | `docs/design/architecture-outline.md` | goals.md 的**投影**：决策后的能力清单，只写「是什么」 |
 | 3 | `docs/design/roadmap.md` | goals.md §6 的**施工版**：包 / 依赖 / 体量 / 决策截止点 |
 | 4 | `docs/design/ai-native-engine.md` | AI 基础设施规格，goals.md 的下级文档 |
+| **证据** | `docs/design/adr-00N-walkthrough.md`<br>`docs/design/spike-00N-*.md` | **不是规范，是证据记录**。它们说明某个结论是怎么被验证的、撞到过什么。<br>**不要改它们的结论**——要推翻，去改上游 ADR 并新开一轮推演 |
+
+**为什么把证据单列一档**：ADR 写「是什么」，walkthrough / spike 写「怎么验的、验出了什么」。
+这个仓库的六处 ADR-002 缺口、八处 ADR-003 缺口、Rapier 跨版本行为差异、
+koota 迭代顺序错位——**全部是真做一遍撞出来的，纸面通读发现不了**。
+证据文档保留这些过程，是为了下一个接手的人不必重新踩一遍。
 
 `docs/conventions/`、`docs/architecture/` 是**从 `E:\GameHub` 继承的存量参考**（已冻结）。
 文档里形如 `../../js/core/History.js` 的链接指向那个仓库，**在本仓库内断链是有意的**。
 
-**编辑规则的出处是 `goals.md §0.5`**（五条：不写工期 / 决策表只增不改 / 判据可判定 /
-单点选型另开 ADR / 结构性改动升版本号）。**本文引用它，不复制它**——
+**编辑规则的出处是 `goals.md §0.5`**（六条：不写工期 / 决策表只增不改 / 判据可判定 /
+单点选型另开 ADR / 结构性改动升版本号 / 非平凡任务先交决策覆盖与证据契约）。**本文引用它，不复制它**——
 规则复制到第二个地方，两处就会各自漂移。
 
 ---
@@ -58,7 +82,8 @@ python tools/check-docs.py
 
 **1 · 读** —— §0 的三处 + 与提议直接相关的章节。**不要通读 goals.md**（近 2000 行），按 §0.4 的指引跳。
 
-**2 · 判** —— 提议要依次过四关，任一关不过就驳回或先改文档：
+**2 · 判** —— 非平凡任务先按 [ADR-004](docs/design/adr-004-evidence-governed-evolution.md) 写最小 `TaskContract`，
+扫描十二面 `DecisionCoverage` 与负空间；提议再依次过五关，任一关不过就驳回、登记未知或发 `DecisionChallenge`：
 
 | 关 | 判据 |
 |---|---|
@@ -66,6 +91,7 @@ python tools/check-docs.py
 | §2 | 与既有决策冲突 → 要么改提议，要么**新增 `↳` 行推翻旧决策** |
 | §3.2 | 进内核要问：**至少两款目标游戏需要，且分属不同簇吗？**（决策 39） |
 | §3.4 | 落在「本轮做 / 留口 / 封顶」哪一格？**封顶项要做，得先推翻对应决策** |
+| §9 / ADR-004 | 是否依赖未登记假设？风险分数 ≥ 18 或触发硬停止条件 → 只暂停相关不可逆提交，先挑战 / 实验；无关可逆工作继续 |
 
 **3 · 分类** —— 四类改动走不同流程，**别混着做**：
 
@@ -100,6 +126,7 @@ python tools/build-preview.py
 `check-docs.py` 报错就修，**不要忽略**。`preview.html` 是生成物，**永远不要手改**。
 
 **7 · 交** —— 一次迭代一个 commit。消息第一行写清这一版确立了什么，正文列出推翻/修订了哪几条。
+交接同时附 evidence package：真实改动、验证结果、失败与限制、新增/关闭的 `U-NNN`、挑战、剩余风险、复现方式和下一截止点。
 
 ---
 
@@ -118,25 +145,76 @@ python tools/build-preview.py
 
 ## 4 · 当前状态
 
-- **版本**：goals.md v19
-- **护城河**：I1 + I3（AI 与人共用同一条编辑通道，产出同一种材料）
+- **版本**：goals.md v21
+- **设计原则**：I1 + I3（AI 与人共用同一条编辑通道，产出同一种材料）
+- **差异化执行**：确定性 Action 事务 + hard oracle + 逐步证据 + 恒定恢复成本 + 供应商无关（决策 40 的 v20 修订）
+- **研发治理**：`TaskContract` + `DecisionCoverage` + `DecisionChallenge` + champion/challenger；AI 可挑战方案和机制，不得静默改意图、hard oracle、权限或历史（决策 42）
 - **目标游戏**（范围纪律的判据源）：
   俯视指令簇 = 红警 / 星际 / 魔兽 / Dota 2；第三人称动作簇 = 塞尔达 / 艾尔登 / 刺客信条 / **战争机器**
-- **下一步**：ADR-002 的三个手工样例推演 → 冻结事件表求值语义
-  （**全项目唯一「定错了没有退路」的一项**，纯纸面工作，不依赖任何工具链）
 
-> **不要往设计文档里加新范围**，直到 README「下一步」的三件事做完。
-> 现在的决策密度已经超前于实现进度，再写只会增加未经验证的规范。
+### M0 已完成（2026-08-09）
+
+| | |
+|---|---|
+| ✅ **ADR-002 求值语义** | **已验证** · r2。[两轮推演](docs/design/adr-002-walkthrough.md)补上 6 处缺口，其中 **D4 是确定性漏洞**（事件入队顺序未定义），纸面通读四版没发现 |
+| ✅ **ADR-001 ECS 选型** | **已验证** · **koota 0.6.6 锁定**（[spike-002](docs/design/spike-002-ecs.md)）。`U-001` 关闭 |
+| ✅ **ADR-003 控制协议** | r2，[两轮推演](docs/design/adr-003-walkthrough.md)补上 8 处缺口。**纸面完成，实现验证在 M1-b 内做** |
+| ✅ **M0-b 工程地基** | vite + three 0.180 + Rapier 0.20（**全部精确版本**）；`npm test` 6 项 |
+| ⚠️ **Rapier 确定性** | 同机 + 跨 V8 版本通过；**跨 CPU 架构未验**（需第二台机器，截止点闸门 A）。另发现**跨 Rapier 版本行为不同**（`U-039`） |
+| ⬜ **ADR-004 治理回放** | G1–G3 未做。横切约束，**不阻塞 M1** |
+
+- **下一步**：**M1-a ECS 封装层** → M1-c → M1-b。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
+  **M1-a 带一项 spike 实测出来的硬职责**：`query()` 必须按稳定 id 升序排序（koota 在实体 id 复用后会错位）。
+
+> **不要往设计文档里加新范围。** 决策密度仍然超前于实现进度。
+>
+> 「不加新规范直到至少一份 ADR 已验证」这条**已达成**（ADR-001、ADR-002）。
+> 它换成了一条更强的：
+> **M1 期间新增的任何协议字段，都要有一个跑得起来的测试，而不是又一段纸面规范。**
+> ADR-002 的 D4、ADR-001 的排序职责都已经做到了——照着做。
 
 ---
 
-## 5 · 交接检查表
+## 5 · 写代码时的约定
+
+代码在 `src/`，测试在 `tests/`，spike 在 `tools/spikes/`。**只有四条约定，但都别漏**：
+
+**① 每个测试要声明它守住了什么。** `tools/status.py` 靠这个算进度——
+**没有标记的测试不计入判据覆盖**，机制会静默失效：
+
+```js
+// @covers I7 决策29 ADR-002:D4
+test('相同输入产生逐 tick 相同的玩法状态', () => { ... });
+```
+
+文件头用 `@package M1-a` 声明它验收哪个包。
+
+**② 「通过」必须先证明测法能检出差异。** 每组确定性断言旁边要有一个**植入负例**，
+否则"一致"可能只是指纹根本没在测东西。
+
+> 这条是踩出来的：Rapier spike 第一版用 `1e-12` 扰动做负例，**没被检出**，
+> 一度判定指纹失效。真相是 **Rapier 内部是 f32**，小于 `2.4e-7` 的扰动在写入时就被吞了。
+> 见 [spike-001](docs/design/spike-001-rapier-determinism.md) 第 2.1 节。
+
+**③ 依赖锁精确版本，不用 `^` 范围。** 已实测 **Rapier 0.19.3 与 0.20.0 行为不同**
+（同场景接触事件数差 4.4 倍），版本漂移直接违反 **I11**。理由写在 `package.json` 的 `//` 字段里。
+
+**④ 玩法层零渲染依赖。** `src/sim/` 不得 import three.js——不变量 **I7** 要求任何时候都能不开界面跑完整场景并断言结果。
+
+---
+
+## 6 · 交接检查表
 
 接手时逐条确认，**任一条不过就先问，不要开始改**：
 
+- [ ] `npm install && npm test` 通过
 - [ ] `python tools/check-docs.py` 通过
+- [ ] `npm run status` 跑过，知道当前 ADR 状态与下一个截止的未决项
 - [ ] `git status` 干净，`git log` 能看到迭代历史
 - [ ] 读完 goals.md §0 冷启动
 - [ ] 知道 goals.md 是最高裁决依据，outline 与 roadmap 是它的投影
-- [ ] 知道 `preview.html` 是生成物
+- [ ] 知道 `preview.html` 与 `STATUS.md` 都是生成物
 - [ ] 知道要改的东西属于四类改动中的哪一类
+- [ ] **要写代码的话**：读过 §5 四条约定，尤其 `@covers` 标记与植入负例
+- [ ] 非平凡任务已经完成 `TaskContract` / `DecisionCoverage`；未知项有 `U-NNN`，高风险项没有被静默补义
+- [ ] 交接会附 evidence package，而不是只说“已完成”

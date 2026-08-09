@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """文档一致性校验。改完文档跑一遍：python tools/check-docs.py
 
-十项检查：
+十九项检查：
   1. 相对链接指向的文件存在
   2. goals.md 的内部锚点指向真实存在的小节
   3. 决策编号连续、无重复
@@ -12,6 +12,15 @@
   8. ADR 状态 vs 下游措辞：下游不得超前于 ADR 的状态    （v19）
   9. 退役术语（术语层 / 简易模式）未出现在当前态文档里    （v19）
  10. 裸引用（§N.M / 决策 N）指向真实存在的小节与决策     （v19）
+ 11. 当前版本同步到 README / AGENTS / outline / roadmap / SVG （v20）
+ 12. ADR-003 进入预览，控制协议关键投影齐全                 （v20）
+  13. v18「档 2 留口 / AI 自己试玩」旧当前态不再出现          （v20）
+  14. ADR-004 进入预览，决策发现与演化协议投影齐全             （v21）
+  15. §9 不确定项 ID 连续、风险乘积正确、引用存在               （v21）
+  16. v20「四件事 / 两份纸面 ADR」旧当前态不再出现             （v21）
+  17. 每份 ADR 都进了 README 文件树与 build-preview           （v21 审计）
+  18. M0 顺序：治理 G1/G2 不得前置于 ADR-002                  （v21 审计）
+  19. AGENTS/README 里的 ADR 状态断言与实际一致              （交接审计）
 """
 import io, os, re, sys, glob
 
@@ -27,7 +36,7 @@ OVERTURNED = {
 
 # 已退役的术语。出现在「当前态」文档里即告警；带下列标记的行视为历史叙述，豁免。
 RETIRED_TERMS = ['术语层', '简易模式']
-HIST_MARKS = ['v15', 'v16', 'v17', 'v18', 'v19', '原文', '推翻', '取消', '已于', '曾', '改写']
+HIST_MARKS = ['v15', 'v16', 'v17', 'v18', 'v19', 'v20', 'v21', '原文', '推翻', '取消', '已于', '曾', '改写']
 
 problems, notes = [], []
 
@@ -201,6 +210,183 @@ for m in mds():
     for n in set(int(x) for x in re.findall(r'决策\s*(\d+)', s)):
         if n > maxdec:
             problems.append('[裸引用] %s 引用决策 %d，最大编号只有 %d' % (rel(m), n, maxdec))
+
+# ---- 11. 当前版本投影 ------------------------------------------------------
+current_version = facts.get('当前版本')
+if current_version:
+    version_targets = {
+        'README.md': '当前 **%s**' % current_version,
+        'AGENTS.md': 'goals.md %s' % current_version,
+        'docs/design/architecture-outline.md': '对应 goals.md %s' % current_version,
+        'docs/design/roadmap.md': '对应 goals.md %s' % current_version,
+        'docs/diagrams/overview.svg': 'goals.md %s' % current_version,
+    }
+    for name, needle in version_targets.items():
+        p = os.path.join(BASE, *name.split('/'))
+        if not os.path.exists(p) or needle not in read(p):
+            problems.append('[当前版本] %s 缺少「%s」' % (name, needle))
+
+# ---- 12. v20 控制协议投影 -------------------------------------------------
+protocol_targets = {
+    'docs/design/architecture-outline.md': ('PlanContract', 'EvidenceLedger', '验证驱动自主循环'),
+    'docs/design/roadmap.md': ('adr-003-verified-agent-loop.md', 'M3-e **orchestrator 状态机**', 'M3-h **`EvidenceLedger`'),
+    'docs/design/ai-native-engine.md': ('## 控制协议 · Plan-Build-Verify-Repair', '验证驱动的自主循环', '错误通过率'),
+    'README.md': ('ADR-003', 'PlanContract'),
+    'AGENTS.md': ('决策 40 的 v20 修订', 'hard oracle'),
+}
+for name, needles in protocol_targets.items():
+    p = os.path.join(BASE, *name.split('/'))
+    s = read(p) if os.path.exists(p) else ''
+    for needle in needles:
+        if needle not in s:
+            problems.append('[控制协议] %s 缺少「%s」' % (name, needle))
+
+preview_builder = read(os.path.join(BASE, 'tools', 'build-preview.py'))
+if 'adr-003-verified-agent-loop.md' not in preview_builder:
+    problems.append('[预览] tools/build-preview.py 未纳入 ADR-003')
+
+# ---- 13. v18 自主循环旧当前态 ---------------------------------------------
+legacy_patterns = (
+    ('受监督的自主循环', '留口'),
+    ('AI 自己试玩', '本轮做'),
+    ('A1 / A2 留口',),
+)
+for name in ('docs/design/architecture-outline.md', 'docs/design/roadmap.md',
+             'docs/design/ai-native-engine.md'):
+    p = os.path.join(BASE, *name.split('/'))
+    for i, line in enumerate(read(p).split('\n'), 1):
+        if any(all(part in line for part in pattern) for pattern in legacy_patterns):
+            problems.append('[旧 AI 当前态] %s:%d: %s' % (name, i, line.strip()[:90]))
+
+# ---- 14. v21 决策治理协议投影 ---------------------------------------------
+governance_targets = {
+    'docs/design/adr-004-evidence-governed-evolution.md': ('TaskContract', 'DecisionChallenge', 'EvolutionProposal', '## 14. 最小执行模板'),
+    'docs/design/architecture-outline.md': ('TaskContract', 'DecisionChallenge', 'champion/challenger'),
+    'docs/design/roadmap.md': ('adr-004-evidence-governed-evolution.md', 'M0-d 决策治理准入', '治理准入 G0'),
+    'docs/design/ai-native-engine.md': ('## 研发治理 · Discover-Challenge-Evolve', 'DecisionCoverage', 'champion'),
+    'README.md': ('ADR-004', 'DecisionCoverage'),
+    'AGENTS.md': ('TaskContract', 'DecisionChallenge', 'evidence package'),
+}
+for name, needles in governance_targets.items():
+    p = os.path.join(BASE, *name.split('/'))
+    s = read(p) if os.path.exists(p) else ''
+    for needle in needles:
+        if needle not in s:
+            problems.append('[决策治理] %s 缺少「%s」' % (name, needle))
+
+if 'adr-004-evidence-governed-evolution.md' not in preview_builder:
+    problems.append('[预览] tools/build-preview.py 未纳入 ADR-004')
+
+# ---- 15. §9 结构化不确定项 ------------------------------------------------
+mu = re.search(r'## 九 · 未决项(.*?)\n\*\*已决并移出\*\*', g, re.S)
+uncertainty_ids = []
+if not mu:
+    problems.append('[不确定项] 找不到 §9 活动登记表')
+else:
+    allowed_types = {'事实', '语义', '架构', '产品', '交付'}
+    for line in mu.group(1).split('\n'):
+        if not re.match(r'^\|\s*\*\*U-\d{3}\*\*\s*\|', line):
+            continue
+        cells = [x.strip() for x in line.strip('|').split('|')]
+        if len(cells) != 5:
+            problems.append('[不确定项] 列数不是 5: %s' % line[:90])
+            continue
+        uid = re.search(r'U-(\d{3})', cells[0])
+        if not uid:
+            continue
+        uncertainty_ids.append(int(uid.group(1)))
+        if cells[2] not in allowed_types:
+            problems.append('[不确定项] U-%s 类型无效: %s' % (uid.group(1), cells[2]))
+        score = re.fullmatch(r'([1-3])/([1-3])/([1-3])=(\d+)', cells[3])
+        if not score:
+            problems.append('[不确定项] U-%s 风险格式无效: %s' % (uid.group(1), cells[3]))
+        elif int(score.group(1)) * int(score.group(2)) * int(score.group(3)) != int(score.group(4)):
+            problems.append('[不确定项] U-%s 风险乘积错误: %s' % (uid.group(1), cells[3]))
+        if '·' not in cells[4]:
+            problems.append('[不确定项] U-%s 缺少「截止点 · 证据」: %s' % (uid.group(1), cells[4]))
+
+if uncertainty_ids:
+    if uncertainty_ids != sorted(set(uncertainty_ids)):
+        problems.append('[不确定项] 活动 ID 重复或顺序错误: %s' % uncertainty_ids)
+    sec9 = g.split('## 九 · 未决项', 1)[1].split('\n---\n', 1)[0]
+    valid_uncertainty_ids = set(int(x) for x in re.findall(r'U-(\d{3})', sec9))
+    expected = set(range(1, max(valid_uncertainty_ids) + 1))
+    if valid_uncertainty_ids != expected:
+        problems.append('[不确定项] §9 登记 ID 不连续，缺: %s' % sorted(expected - valid_uncertainty_ids))
+    notes.append('活动不确定项 %d 条，累计登记 %d 条' %
+                 (len(uncertainty_ids), len(valid_uncertainty_ids)))
+    for m in mds():
+        for n in set(int(x) for x in re.findall(r'U-(\d{3})', read(m))):
+            if n not in valid_uncertainty_ids:
+                problems.append('[不确定项] %s 引用不存在的 U-%03d' % (rel(m), n))
+
+# ---- 16. v20 治理旧当前态 -------------------------------------------------
+governance_legacy = ('眼下四件事', '「下一步」的四件事', '两份 ADR 都是纸面工作')
+for name in ('README.md', 'AGENTS.md', 'docs/design/architecture-outline.md', 'docs/design/roadmap.md'):
+    p = os.path.join(BASE, *name.split('/'))
+    for i, line in enumerate(read(p).split('\n'), 1):
+        if any(old in line for old in governance_legacy):
+            problems.append('[旧治理当前态] %s:%d: %s' % (name, i, line.strip()[:90]))
+
+# ---- 17. 每份 ADR 都进了 README 文件树与预览 -------------------------------
+# v21 审计发现：ADR-004 已在 README 正文被引用，却漏在文件树里，而检查 14 只查正文字符串。
+# 「投影漂移」这次漂在了防漂移机制的缝隙上，所以这条按目录实际内容枚举，不按硬编码清单。
+readme = read(os.path.join(BASE, 'README.md'))
+tree_blocks = [b for b in re.findall(r'```[^\n]*\n(.*?)```', readme, re.S) if 'Clay/' in b]
+tree = '\n'.join(tree_blocks)
+for adr in sorted(glob.glob(os.path.join(BASE, 'docs', 'design', 'adr-*.md'))):
+    fn = os.path.basename(adr)
+    if not tree:
+        problems.append('[ADR 投影] README.md 找不到文件树代码块')
+        break
+    if fn not in tree:
+        problems.append('[ADR 投影] README.md 文件树缺少 %s' % fn)
+    if fn not in preview_builder:
+        problems.append('[ADR 投影] tools/build-preview.py 未纳入 %s' % fn)
+
+# ---- 18. M0 顺序：治理不得前置于求值语义 -----------------------------------
+# v21 审计修正：ADR-002 是唯一不可逆项，治理 G1/G2 与它并行，不作为它的前置。
+order_legacy = ('先做治理 G1/G2', '先用 ADR-004 的 G1/G2 建立治理准入',
+                '进入 AI 指挥前的第一件事', '再让后续 AI 推演 ADR-002')
+for name in ('README.md', 'AGENTS.md', 'docs/design/roadmap.md', 'docs/design/goals.md'):
+    p = os.path.join(BASE, *name.split('/'))
+    for i, line in enumerate(read(p).split('\n'), 1):
+        if any(old in line for old in order_legacy):
+            problems.append('[M0 顺序] %s:%d: %s' % (name, i, line.strip()[:90]))
+
+# ---- 19. 交接规范里的 ADR 状态断言必须与实际一致 ---------------------------
+# 交接规范自身会过期，而且比设计文档更快——它含「当前状态」与「下一步」。
+# 一次审计发现 AGENTS.md 还写着「四份 ADR 全部停在倾向已定，零个判据被验证过」，
+# 而那时 ADR-001 / ADR-002 已经是「已验证」——接手的模型会据此完全误判项目状态。
+STATES = ['草案', '倾向已定', '已验证', '已冻结', '已取代']
+real_state = {}
+for p in sorted(glob.glob(os.path.join(BASE, 'docs', 'design', 'adr-*.md'))):
+    fn = os.path.basename(p)
+    if 'walkthrough' in fn:
+        continue
+    m = re.search(r'\|\s*\*\*状态\*\*\s*\|\s*\*\*(.+?)\*\*', read(p))
+    if m:
+        st = m.group(1).strip()
+        real_state[fn[:7]] = next((s for s in STATES if st.startswith(s)), st)
+
+for name in ('AGENTS.md', 'README.md'):
+    p = os.path.join(BASE, name)
+    for i, line in enumerate(read(p).split('\n'), 1):
+        # 只查同一行里既点名了某份 ADR、又给出了状态词的断言
+        for key in set(re.findall(r'[Aa][Dd][Rr]-(\d{3})', line)):
+            fn = 'adr-%s' % key
+            if fn not in real_state:
+                continue
+            claimed = [s for s in STATES if s in line]
+            if claimed and real_state[fn] not in claimed:
+                problems.append('[交接状态] %s:%d 声称 ADR-%s 是「%s」，实际是「%s」'
+                                % (name, i, key, '/'.join(claimed), real_state[fn]))
+    # 整体性断言：说「全部停在 X」时，实际必须真的全部是 X
+    for i, line in enumerate(read(p).split('\n'), 1):
+        m = re.search(r'(?:四|五|全)份?\s*ADR\s*(?:都|全部)?\s*(?:停在|处于)\s*[「"]?(\S+?)[」"]?[，。\s]', line)
+        if m and set(real_state.values()) != {m.group(1)}:
+            problems.append('[交接状态] %s:%d 声称全部 ADR 处于「%s」，实际分布：%s'
+                            % (name, i, m.group(1), sorted(set(real_state.values()))))
 
 # ---- 输出 -----------------------------------------------------------------
 print('检查了 %d 份文档' % len(mds()))

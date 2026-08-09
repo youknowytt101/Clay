@@ -11,6 +11,12 @@ DOCS = [
     ('ai',        'AI 基础设施规格',          os.path.join(BASE, r'docs\design\ai-native-engine.md')),
     ('adr1',      'ADR-001 · ECS 选型',       os.path.join(BASE, r'docs\design\adr-001-ecs.md')),
     ('adr2',      'ADR-002 · 事件表求值语义', os.path.join(BASE, r'docs\design\adr-002-eventsheet-eval.md')),
+    ('adr3',      'ADR-003 · 验证驱动的 AI 控制循环', os.path.join(BASE, r'docs\design\adr-003-verified-agent-loop.md')),
+    ('adr4',      'ADR-004 · 证据治理的决策发现与演化', os.path.join(BASE, r'docs\design\adr-004-evidence-governed-evolution.md')),
+    ('adr2wt',    'ADR-002 手工样例推演 · 第一轮', os.path.join(BASE, r'docs\design\adr-002-walkthrough.md')),
+    ('adr3wt',    'ADR-003 手工样例推演 · 第一轮', os.path.join(BASE, r'docs\design\adr-003-walkthrough.md')),
+    ('spike1',    'Spike-001 · Rapier 确定性（同机）', os.path.join(BASE, r'docs\design\spike-001-rapier-determinism.md')),
+    ('spike2',    'Spike-002 · ECS 选型验证', os.path.join(BASE, r'docs\design\spike-002-ecs.md')),
     ('ui',        '编辑器 UI 约定',           os.path.join(BASE, r'docs\conventions\ui.md')),
     ('roads',     '道路系统架构（存量参考）',  os.path.join(BASE, r'docs\architecture\roads.md')),
 ]
