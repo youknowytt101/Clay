@@ -1,8 +1,8 @@
-# Spike-001 · Rapier 确定性 · 第一轮（同机）
+# Spike-001 · Rapier / Transform 跨架构确定性
 
 | | |
 |---|---|
-| **状态** | **部分完成** —— 同机重跑通过；**跨机 / 跨平台未验**，`U-025` / `U-046` 仍活动 |
+| **状态** | **已完成** —— 同机、跨 V8 版本、GitHub Actions Linux x64 ↔ ARM64 全部通过；`U-025` / `U-046` 关闭 |
 | **日期** | 2026-08-08 |
 | **上游** | [goals.md](goals.md) 决策 29、`U-025`、`U-046`；[roadmap.md](roadmap.md) M1-e |
 | **脚本** | [`tools/spikes/rapier-determinism.mjs`](../../tools/spikes/rapier-determinism.mjs) |
@@ -125,6 +125,20 @@ M0-b 建工程时 `package.json` 写了 `^0.19.0`，装到 0.19.3；而本 spike
 并在文件里写明理由。**但锁版本只解决"我们自己不漂"，不解决"将来必须升级时老作品怎么办"**——
 后者需要在快照里记录物理引擎版本，属于 I11 迁移链的一部分，已登记为 [`U-039`](goals.md#九--未决项)。
 
+### 2.4 闸门 A：Linux x64 ↔ ARM64
+
+[GitHub Actions run 31320198471](https://github.com/youknowytt101/Clay/actions/runs/31320198471) 在同一提交上依次运行
+Linux x64（AMD EPYC）与 Linux ARM64，Node 均为 24.18.0，源码哈希和精确依赖版本相同：
+
+| 指纹 | x64 | ARM64 |
+|---|---|---|
+| Rapier 状态（600 tick） | `85cff7f8f866e20f` | `85cff7f8f866e20f` |
+| Rapier 接触事件（156 个） | `3f0480a84fcddd29` | `3f0480a84fcddd29` |
+| Transform 四层世界 TRS | `d7f8d8b3699f8168` | `d7f8d8b3699f8168` |
+
+两侧本机重跑一致，Rapier f32 与 Transform f64 植入负例均被检出。原始 JSON 保存在
+[`docs/design/evidence/`](evidence/)，并由 [`tests/gate-a-evidence.test.mjs`](../../tests/gate-a-evidence.test.mjs) 持续对拍。
+
 ---
 
 ## 3. 这一轮证明了什么、没证明什么
@@ -133,13 +147,13 @@ M0-b 建工程时 `package.json` 写了 `^0.19.0`，装到 0.19.3；而本 spike
 |---|---|
 | **已证明** | 同一进程内两个独立 world，同一输入 → 状态与事件序列**逐 tick 完全一致**；采集方法对 ≥ f32 精度的差异敏感 |
 | **已证明** | 同一 CPU 上，**node 与浏览器（两个不同版本的 V8）结果逐位相同** |
-| **未证明** | **跨机器、跨 OS、跨 CPU 架构（尤其 x64 ↔ ARM）是否一致** —— 这才是决策 29 与 lockstep 真正需要的 |
+| **已证明** | 同一 Linux / Node / 精确依赖下，真实 **x64 ↔ ARM64** runner 的 Rapier 状态 / 事件与 Transform 位模式一致 |
 | **已证伪** | **跨 Rapier 版本不一致**——0.19.3 与 0.20.0 行为不同（见上文第 2.3 节）。版本必须锁死并进快照 |
 | **未证明** | 非 V8 的 wasm 运行时（SpiderMonkey / JavaScriptCore）是否一致 |
 
 **同机一致是最低门槛，不是验收。** 它若不过，项目当场就要换物理库；它过了，只说明可以继续验下一层。
 
-**`U-025` 因此从 `open` 进入 `testing`，不能关闭。**
+**`U-025` / `U-046` 已关闭。** 当前证据满足闸门 A 的跨 CPU 判据；跨 OS 与非 V8 运行时仍是后续兼容性扩展，不回滚本次结论。
 
 ---
 
@@ -152,30 +166,25 @@ Rapier 是 f32 这件事，goals.md 与 adr-001 都没写过。它有两面：
 - **不利**：f32 的中间运算更容易受**指令集差异**影响（FMA 融合乘加、SIMD 宽度、
   x87 与 SSE 的舍入差异）。而这些差异**大于** f32 epsilon，会被放大。
 
-结论：**这一轮的通过完全不能外推到跨平台。** 反而说明跨平台那一轮必须真的在
-不同架构上跑，不能靠"同机通过所以应该没问题"推断。
+结论：同机结果没有被外推；后续已由上面的真实 x64 ↔ ARM64 runner 完成跨 CPU 验证。
 
 ---
 
 ## 5. 下一步
 
-1. **在第二台机器 / 另一 OS / ARM 上跑同一脚本**，比对 §2 的三个指纹。
-   脚本已支持 `--emit <path>` 写出带平台、精确依赖版本、源码哈希与三项指纹的证据 JSON；把第一台机器的文件带到第二台后运行
-   `npm run spike:gate-a -- --compare gate-a-x64.json --emit gate-a-arm64.json`，工具会自动忽略预期不同的平台元数据，严格比较场景 / 依赖与指纹
-2. 若跨平台不一致 → 按决策 29**换物理库，不放宽判据**；
-   若只是事件顺序不一致而状态一致 → [ADR-002 缺口 D](adr-002-walkthrough.md) 的稳定排序层可以救，属于可修复
-3. 补测：Rapier 版本升级前后、浏览器 wasm vs node wasm
+1. 保持 GitHub Actions 在物理 / Transform 源码或精确依赖变化时自动重跑
+2. 将来扩展到跨 OS 与非 V8 wasm 运行时；它们不阻塞当前闸门 A
+3. Rapier 升级时按 `U-039` 保留旧运行时，并重新运行本 spike
 
 ---
 
 ## 6. Evidence package
 
-- **已完成**：同机双 world 一致性 + 指纹有效性负例扫描；跨机器证据已合并 Rapier 状态 / 事件与 `U-046` Transform 位模式，并支持自动比较
-- **未完成**：跨机 / 跨平台 / 跨运行时未验；跨 Rapier 版本一致性已证伪
-- **真实改动**：扩展 `tools/spikes/rapier-determinism.mjs` 与本文，加入 `U-046`、统一证据 JSON 和自动比较；不改变 `U-025` / `U-046` 的活动状态
+- **已完成**：同机、跨 V8、Linux x64 ↔ ARM64；Rapier 状态 / 事件与 Transform 位模式三项对拍；两类植入负例
+- **未完成**：跨 OS 与非 V8 wasm 运行时；跨 Rapier 版本一致性已证伪并由精确运行时版本处理
+- **真实改动**：GitHub Actions 自动闸门、两份原始证据与证据对拍测试；关闭 `U-025` / `U-046`
 - **复现命令**：`npm install && npm run spike:gate-a -- --emit gate-a-x64.json`
 - **原始输出**：见 §2（本机 win32 x64 / node v24.16.0）
-- **失败与限制**：**只有一台机器**，最关键的跨平台一致性无法在本轮验证；
-  第一轮负例（`1e-12`）因 f32 精度被吞而误判为"指纹失效"，已通过量级扫描定位并修正
-- **剩余风险**：决策 29 的最大技术风险（[风险 15](goals.md#十--风险)）**未解除**
-- **下一决策截止点**：闸门 A 前（`U-025`）
+- **失败与限制**：GitHub ARM64 runner 未公开具体 CPU 型号，但 `os.arch()` 为 `arm64`；跨 OS / 非 V8 未覆盖
+- **剩余风险**：未来 Rapier / three / Node 升级可能改变行为，工作流按相关源码和依赖变更自动重跑
+- **下一决策截止点**：已通过闸门 A；后续变化由 CI 持续守门

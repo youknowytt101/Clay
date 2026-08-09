@@ -76,7 +76,7 @@ ADR-003 只需在 M1 的 Action 事务格式落地前走通。
 | M1-b **Action Registry + 步骤事务** | L | M0-c M1-a M1-c | id / schema / 前置条件 / 影响域 / 可逆性；`baseRevision` / `idempotencyKey` / preview / commit / abort；撤销栈 + 变更日志 + `ActionReceipt` / `StepReceipt` |
 | M1-c **序列化、revision 与 checkpoint** | M | M1-a | 版本化信封 + 迁移链 + **按块存取**；快照、命名 checkpoint 与回滚 |
 | M1-d **试飞台 + TestSpec** | M | M1-b M1-c | headless runner：加载 → Action / 输入意图轨迹 → hard 断言 → 证据片段；固定 seed 可重放 |
-| M1-e **Rapier 确定性 spike** | S | M0-b | **独立且尽早**。不过就换库。**已部分完成**（[spike-001](spike-001-rapier-determinism.md)）：同机与跨 V8 版本通过；**跨 CPU 架构未验，需第二台机器**。另发现**跨 Rapier 版本行为不同**（`U-039`） |
+| M1-e **Rapier 确定性 spike** | S | M0-b | **已完成**（[spike-001](spike-001-rapier-determinism.md)）：同机、跨 V8 版本及 Linux x64 ↔ ARM64 均通过；Rapier 状态 / 事件与 Transform 位模式一致，`U-025` / `U-046` 关闭。另发现并处理跨 Rapier 版本行为不同（`U-039`） |
 | M1-f **渲染桥 + Transform + 拾取 + 空间索引** | M | M1-a | three.js 增量同步 |
 | M1-g **分块与流式加载** | L | M1-c M1-f | S1–S3 三条纪律；**这是 M1 最大的一块** |
 | M1-h **编辑器改造** | L | M1-b M1-f | 大纲 / 详情 / gizmo / 多选，全部对 ECS 通用 |
@@ -88,7 +88,7 @@ ADR-003 只需在 M1 的 Action 事务格式落地前走通。
 **砍单顺序**：gizmo / 多选 → 空间索引的 BVH（先只做网格哈希）→ **绝不砍试飞台**
 
 **原本「先做 M1-e」**（唯一可能推翻已定决策的一项，越早发现越便宜）——
-**它已在 M0 期间提前做掉大半**，只剩需要第二台机器的跨架构那一步。
+**它在 M0 期间提前做掉大半，并于 M1 收尾通过 GitHub Actions 的 Linux x64 ↔ ARM64 实测完成。**
 **因此 M1 的第一件事改为 M1-a**，随后 M1-c → M1-b：把 [ADR-003](adr-003-verified-agent-loop.md) 的
 实现验证（事务回滚、计划版本失效、幂等、错误通过负例）**放在 M1-b 内完成，不推到 M3**——
 硬依赖 4 已经写明，那些字段若到 M3 才定会反向重写 M1/M2。

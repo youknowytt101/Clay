@@ -3,10 +3,10 @@
 > **一个 AI 与人共用同一条编辑通道的通用 3D 网页游戏引擎编辑器：
 > 游戏逻辑是数据，AI 和鼠标是同一个命令层的两个前端，产出的是同一种材料。**
 
-**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f / M1-g / M1-h / M1-i / M1-j 已落地。**
+**状态：M1 已完成，10/10 个包均有机器证据；下一步是 ADR-004 治理回放。**
 
 ```bash
-npm install && npm test        # headless 断言（70 项）
+npm install && npm test        # headless 断言（71 项）
 npm run dev                    # 编辑器：大纲 / 详情 / gizmo / 多选 / 分块流式 / AI 单步预览
 ```
 
@@ -181,10 +181,10 @@ python tools/build-preview.py
 | ✅ **AI 控制协议推演**（决策 40） | [ADR-003](docs/design/adr-003-verified-agent-loop.md) **r2**——[两轮推演](docs/design/adr-003-walkthrough.md)补上 8 处缺口；M1-b 已为事务、revision 与修复权限底座提供机器执行证据 |
 | ✅ **工程地基**（M0-b） | vite + three + Rapier 从 npm 加载；`npm test` 6 项 headless 断言 |
 | ✅ **ECS 选型**（ADR-001） | [spike-002](docs/design/spike-002-ecs.md) 六条判据全过，**koota 锁定**；`U-001` 关闭 |
-| ⚠️ **物理确定性**（决策 29） | [spike-001](docs/design/spike-001-rapier-determinism.md)——同机与跨 V8 版本通过；**跨 CPU 架构未验**（需第二台机器，截止点闸门 A） |
+| ✅ **物理 / Transform 确定性**（决策 29） | [spike-001](docs/design/spike-001-rapier-determinism.md)——同机、跨 V8 版本及 GitHub Actions Linux x64 ↔ ARM64 三项指纹全部通过；`U-025` / `U-046` 关闭 |
 | ⬜ **决策治理回放**（决策 42） | [ADR-004](docs/design/adr-004-evidence-governed-evolution.md) G1–G3 未做。横切约束，**不阻塞 M1** |
 
-### M1-a / M1-b / M1-c / M1-d / M1-f / M1-g / M1-h / M1-i / M1-j 已完成；下一步是闸门 A 跨架构实测
+### M1 已完成；下一步是 ADR-004 治理回放
 
 **M1-a ECS 封装层**已经提供稳定实体 id、按 id 升序的 `query()`、声明式组件 schema、
 连续版本迁移与结构化诊断；生产代码只在适配层导入 koota。9 项 M1-a 测试含 koota 原始错序与半写负例，
@@ -224,7 +224,10 @@ translate / rotate / scale gizmo、轨道相机与桌面三栏工作台。编辑
 运行时只注入带种子 `rng`、`tick`、`dt` 以及隔离冻结的 JSON 输入 / 状态，输出归一为确定性 JSON。6 项测试覆盖 J1–J3、静态扫描误报边界、
 确定性负例、输入隔离和 condition / action 返回契约；`U-011` 仍活动，注册责任与事件表集成形状留到 M2-3 决定。
 
-下一步完成 **Rapier / Transform 跨 CPU 架构实测**，随后做 ADR-004 治理回放。
+**M1-e** 已在 GitHub Actions 的 Linux x64 与真实 ARM64 runner 上完成闸门 A 实测：Rapier 状态、156 个接触事件的序列以及
+四层 Transform 世界 TRS 位模式全部一致，两侧重跑和植入负例均通过。证据由第 71 项 headless 测试持续对拍；`U-025` / `U-046` 关闭。
+
+下一步做 **ADR-004 治理回放 G1–G3**。
 
 完整的包拆分、依赖、砍单顺序见 [roadmap.md](docs/design/roadmap.md) M1。
 

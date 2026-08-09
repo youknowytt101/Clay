@@ -160,10 +160,10 @@ python tools/build-preview.py
 | ✅ **ADR-001 ECS 选型** | **已验证** · **koota 0.6.6 锁定**（[spike-002](docs/design/spike-002-ecs.md)）。`U-001` 关闭 |
 | ✅ **ADR-003 控制协议** | r2，[两轮推演](docs/design/adr-003-walkthrough.md)补上 8 处缺口。M1-b 已为事务、revision 与修复权限底座提供机器执行证据 |
 | ✅ **M0-b 工程地基** | vite + three 0.180 + Rapier 0.20（**全部精确版本**）；`npm test` 6 项 |
-| ⚠️ **Rapier 确定性** | 同机 + 跨 V8 版本通过；**跨 CPU 架构未验**（需第二台机器，截止点闸门 A）。另发现**跨 Rapier 版本行为不同**（`U-039`） |
+| ✅ **Rapier / Transform 确定性** | 同机 + 跨 V8 版本 + GitHub Actions Linux x64 ↔ ARM64 三项指纹通过；`U-025` / `U-046` 关闭。跨 Rapier 版本行为由精确版本注册表处理（`U-039` 已关闭） |
 | ⬜ **ADR-004 治理回放** | G1–G3 未做。横切约束，**不阻塞 M1** |
 
-### M1 已启动（2026-08-09）
+### M1 已完成（2026-08-09）
 
 | | |
 |---|---|
@@ -171,13 +171,14 @@ python tools/build-preview.py
 | ✅ **M1-b Action Registry + 步骤事务** | schema / 前置条件 / 稳定影响域 / 真实 diff + preview / commit / abort + revision / 幂等 + checkpoint / 日志 / 撤销；11 项测试。`U-041`、`U-042` 关闭 |
 | ✅ **M1-c 序列化与 checkpoint** | 确定性版本信封 + SHA-256 revision + 按块存取 + 迁移链 + 精确运行时注册表 + 命名 checkpoint；6 项测试。`U-039` 关闭 |
 | ✅ **M1-d 试飞台 + TestSpec** | registry + 固定 seed + checkpoint / 候选世界隔离 + 两层输入适配 + hard / soft oracle + 确定性证据 + M1-b validator；8 项测试。`U-043` / `U-044` 仍活动 |
+| ✅ **M1-e 跨架构确定性** | GitHub Actions Linux x64 ↔ ARM64 对拍 Rapier 状态 / 接触事件与 Transform 位模式；两侧重跑及植入负例通过；1 项证据测试。`U-025` / `U-046` 关闭 |
 | ✅ **M1-f 渲染桥 + Transform + 拾取 + 空间索引** | ECS Transform 层级 + 稳定网格索引 + 实体射线拾取 + Three.js 增量只读投影；9 项测试覆盖层级失败、索引原子性、稳定命中、投影生命周期与禁止回写 |
 | ✅ **M1-g 分块与流式加载** | 稳定空间块策略 + Transform 世界坐标块解析 + RenderBridge 投影过滤；权威玩法世界常驻，卸载只移除表现与拾取索引；4 项测试覆盖 S1–S3 与跨块事务。`U-024` 参数调优仍活动 |
 | ✅ **M1-h 编辑器改造** | ECS 大纲 + schema 详情 + 点选 / 多选 / 拖框 + 三模式 gizmo + 桌面三栏工作台；所有持久编辑统一走 Action 事务；6 项测试覆盖 GUI 对拍、批量回滚、选择隔离、世界重绑定、层级环拒绝与父子变换 |
 | ✅ **M1-i 最小 AI 单步指令** | 供应商无关解释器边界 + Action allowlist + 宿主影响域授权 + 真实 diff 预览 + 显式确认 / 取消；重复 request id 不重复解释或执行；4 项测试含越权负例 |
 | ✅ **M1-j 确定性沙箱 J1–J3** | 条件 / 动作脚本注册时静态拒绝环境时间 / 随机、网络、存储、DOM 与动态代码；执行时只注入带种子 `rng`、`tick`、`dt` 和隔离 JSON；6 项测试含确定性与静态拒绝负例。`U-011` 仍活动 |
 
-- **下一步**：补 **Rapier / Transform 跨 CPU 架构实测**，随后做 ADR-004 治理回放。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
+- **下一步**：做 **ADR-004 治理回放 G1–G3**。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
 
 > **不要往设计文档里加新范围。** 决策密度仍然超前于实现进度。
 >

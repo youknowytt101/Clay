@@ -1782,7 +1782,6 @@ TaskContract
 | **U-022** | 内容包最小字段：id、版本、作者、许可、依赖、哈希 | 语义 | 3/2/3=18 | M2-4 导出格式冻结前 · 依赖解析、缺包、升级和回退推演 |
 | **U-023** | 后端最小形态、OAuth、清理与删除请求 | 架构 | 2/2/2=8 | M4 前 · 发布/删除/举报纵切与合规核对 |
 | **U-024** | 块大小、加载触发、预加载圈和卸载延迟**的取值** | 架构 | 2/2/3=12 | **M2-3**（原 M1-g，2026-08-09 显式延期）· RTS/动作两类场景的确定性、内存和卡顿基准。**机制已由 M1-g 交付**（`size` / `radius` 可配、S1–S3 有测试）；**但取值仍是占位**（`main.js` 的 `chunkSize: 16 / loadRadius: 1` 是演示值，非实测得出）。真实负载要等 M2-3 的 RTS 骨架才有 |
-| **U-025** | Rapier 能否跨平台逐帧确定 | 事实 | 2/3/3=18 | 闸门 A 前 · 两台机器固定输入逐 tick **状态哈希 + 接触事件序列**；不通过换库。**同机已通过**，见 [spike-001](spike-001-rapier-determinism.md)；跨平台未验 |
 | **U-026** | 1000 个完整模拟实体是否可达 | 事实 | 1/2/3=6 | M2 RTS 模板 · 真实玩法负载与帧时间剖析 |
 | **U-027** | provider 能力探测靠声明、请求还是组合 | 架构 | 1/2/2=4 | M3-a · 三类 provider 的误报/漏报与降级纵切 |
 | **U-028** | 弱模型降级重试次数与超时上限 | 交付 | 1/2/2=4 | D.6 · 成功率、时间、费用和停止质量分布 |
@@ -1795,7 +1794,6 @@ TaskContract
 | **U-043** | `inputTrace` 是否分意图层 / 设备层；UI 命中测试能否作 hard oracle | 语义 | 3/2/3=18 | M3-f 前 · [ADR-003 推演](adr-003-walkthrough.md) 第 2.1 节；不解决则「错误通过率 0」不可达 |
 | **U-044** | 回归测试范围由谁圈定；`TestSpec` 是否需要 `covers` 字段 | 语义 | 2/2/3=12 | M3-f 前 · [ADR-003 推演](adr-003-walkthrough.md) 第 2.2 节；AI 可"少跑"而不触发任何现有停止条件 |
 | **U-045** | 能力缺口的识别机制；`primitivesUsed` / `capabilityGap` 是否进 `PlanStep` | 架构 | 1/3/2=6 | M3-g 前 · [ADR-003 推演](adr-003-walkthrough.md) 第 3.2 节 |
-| **U-046** | **玩法层的矩阵数学是否要脱离 three**：`core/transform.js` 现在 import three 的 `Matrix4/Quaternion/Vector3`。不违反 I7 字面（headless 可跑），但 core 依赖渲染库属分层泄漏，且 `decompose()` 的 `sqrt/atan2` **不保证跨平台位级一致**，而它的结果会进玩法断言 | 架构 | 2/2/3=12 | **闸门 A 前**（原 M1-g，2026-08-09 随 `U-025` 对齐）· 与 `U-025` 同批实测：两台机器对同一层级做 `getWorldTransform` 比对位级一致性；不一致则把矩阵数学内联进 core（约 80 行）并自控算法。**两项都卡在同一件事上——需要第二台 CPU 架构不同的机器** |
 
 **已决并移出**：**U-001 ECS 库选型**——2026-08-09 由 [spike-002](spike-002-ecs.md) 关闭，
 **koota 0.6.6 锁定**（六条判据全过；重放确定性成立，但迭代顺序需封装层按稳定 id 排序，
@@ -1813,6 +1811,12 @@ TaskContract
 **U-042 修复 Action 白名单与越界路由**——2026-08-09 由 [M1-b 验收](../../tests/actions.test.mjs)关闭：
 repair 只能使用本步骤已批准的 `allowedActions` 与稳定语义影响域，超出任一者稳定转 `needs-review`；
 不得在 `Repairing → Executing` 环内自行扩权；
+**U-025 Rapier 跨平台逐帧确定性**与 **U-046 Transform 是否脱离 three 数学**——2026-08-09 由
+[GitHub Actions 闸门 A 实测](https://github.com/youknowytt101/Clay/actions/runs/31320198471)关闭：同一源码、Node 24.18、Rapier 0.20.0、three 0.180.0
+在 Linux x64（AMD EPYC）与 Linux ARM64 上运行 600 tick，Rapier 状态 `85cff7f8f866e20f`、接触事件 `3f0480a84fcddd29`
+（156 个）和四层 Transform 位模式 `d7f8d8b3699f8168` 全部一致；两侧本机重跑与植入负例均通过。
+因此决策 29 的闸门 A 跨 CPU 判据通过，当前 `core/transform.js` 保留 three 数学；精确版本继续由 U-039 的运行时注册表约束。
+原始证据由 [`tests/gate-a-evidence.test.mjs`](../../tests/gate-a-evidence.test.mjs) 对拍守住；
 **U-033 / U-035 / U-036 / U-037 / U-038 事件表求值语义的五处缺口**——2026-08-09 由 [ADR-002 r2](adr-002-eventsheet-eval.md) 关闭，见[两轮推演](adr-002-walkthrough.md)：U-033 触发规则从**载荷起点**（§3.3 的 A1）；U-035 排空时载荷已销毁则**跳过**（硬性质 E4，与 W3 / R4 同构）；U-036 同 step 内触发事件**按 (类型, 主 id, 次 id) 稳定排序**后入队（§8 的 D4，由 [`tests/toolchain.test.mjs`](../../tests/toolchain.test.mjs) 的 2 项测试守着）；U-037 计时器是**一等概念**、内核按 `dt` 递减且可序列化（§7.2）；U-038「存在 X」**就是筛选条件**，不是独立的布尔形态（§5）。**这五条在 r2 落地时未同步关闭，导致 `npm run status` 把已解决项排在「最紧急」的最前面**——登记表失真本身就是一次真实的漂移案例；构建与依赖管理（阶段零）；**事件表的求值模型与实体集传递语义**——v16 移出，前置到阶段零定稿，见 [adr-002](adr-002-eventsheet-eval.md)（决策 31）；
 BYOK 密钥存放（桌面外壳 + 网页代理）；事件表表达力边界（决策 18）；模型接入的抽象层形态（决策 21）；
 **事件表要不要真函数**——v11 结案：**要做**，形式是「带参数的可复用行为单元」（§4.7）。

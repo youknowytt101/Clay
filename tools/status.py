@@ -125,7 +125,9 @@ for k in ('关键', '受控', '可逆'):
         ' '.join('U-' + i['id'] for i in buckets[k][:14]) +
         (' …' if len(buckets[k]) > 14 else '')))
 
-closed = len(re.findall(r'U-(\d{3})', sec9)) - len(items)
+registered_ids = set(re.findall(r'U-(\d{3})', sec9))
+active_ids = {it['id'] for it in items}
+closed = len(registered_ids - active_ids)
 say()
 say('  活动 %d 条 · 已关闭 %d 条' % (len(items), closed))
 
