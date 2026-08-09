@@ -49,8 +49,10 @@
 ```
 Clay/
 ├─ README.md              本文
-├─ preview.html           全部文档合成的单页预览（生成物）
+├─ CLAUDE.md              给 AI 的工作说明：权威顺序 · 编辑规则 · 易漏点
+├─ preview.html           全部文档合成的单页预览（生成物，勿手改）
 ├─ tools/
+│  ├─ check-docs.py       文档一致性校验
 │  ├─ build-preview.py    重新生成 preview.html
 │  └─ preview-template.html
 └─ docs/
@@ -92,11 +94,20 @@ Clay/
 4. **单点技术选型另开 ADR**（`design/adr-NNN-*.md`），大纲只引用结论
 5. **每次结构性改动更新版本号**并在开头说明这一版确立了什么
 
-改完文档后，重新生成单页预览：
+改完文档后，跑这两条：
 
+```bash
+python tools/check-docs.py
+```
 ```bash
 python tools/build-preview.py
 ```
+
+`check-docs.py` 查断链、锚点、决策编号连续性、声明条数与实际是否一致，
+以及**已推翻的决策是否还在别处被当成现行的引用**——v17 那次漏改 `conventions/ui.md`
+就是这类问题。**报错就修，不要忽略。**
+
+给 AI 的工作说明在 [CLAUDE.md](CLAUDE.md)：权威顺序、编辑规则、最容易漏的地方。
 
 ---
 
