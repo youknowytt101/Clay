@@ -131,7 +131,6 @@ const workbench = createEditorWorkbench({
   statusMount: document.getElementById('editor-status'),
   undoButton: document.getElementById('undo'),
   modeButtons: [...document.querySelectorAll('.mode-button')],
-  panelButtons: [...document.querySelectorAll('.panel-button')],
 });
 
 document.getElementById('entity-count').textContent = `${engine.world.query().length} 项`;

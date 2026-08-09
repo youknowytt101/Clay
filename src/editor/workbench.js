@@ -47,7 +47,6 @@ export function createEditorWorkbench({
   statusMount,
   undoButton,
   modeButtons,
-  panelButtons,
 } = {}) {
   if (!session || !bridge || !scene || !camera || !renderer) throw new TypeError('editor workbench dependencies are required');
 
@@ -410,13 +409,6 @@ export function createEditorWorkbench({
     });
   }
   setButtonPressed(modeButtons, gizmoMode);
-
-  for (const button of panelButtons) {
-    button.addEventListener('click', () => {
-      document.body.dataset.mobilePanel = button.dataset.panel;
-      for (const item of panelButtons) item.setAttribute('aria-pressed', String(item === button));
-    });
-  }
 
   undoButton.addEventListener('click', async () => {
     try {

@@ -1,3 +1,7 @@
+// 注意：core 层在这里 import 了渲染库的数学类。不违反 I7（这些是纯 f64 数学类，
+// headless 可跑，测试为证），但它是一处**分层泄漏**，且 decompose() 的 sqrt/atan2
+// 不保证跨平台位级一致——而结果会进玩法断言。已登记为 U-046，与 U-025 同批实测；
+// 不一致就把矩阵数学内联进 core 并自控算法。**在那之前不要扩大 three 在 core 的用量。**
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { defineComponent } from './ecs.js';
 

@@ -158,18 +158,3 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .status-message[data-tone="success"] { color: #80cfaa; }
 .status-message[data-tone="error"] { color: var(--danger); }
 .status-hint { color: #6f7680; }
-.mobile-tabs { display: none; }
-
-@media (max-width: 760px) {
-  :root { --topbar: 42px; --statusbar: 27px; }
-  .brand span, .status-hint { display: none; }
-  .topbar { gap: 7px; padding: 0 7px; }
-  .workspace { grid-template-columns: 1fr; grid-template-rows: minmax(300px, 1fr) minmax(210px, 38vh); }
-  .viewport-panel { grid-row: 1; }
-  .panel { grid-row: 2; border: 0; border-top: 1px solid var(--line); }
-  body[data-mobile-panel="outline"] .inspector-panel { display: none; }
-  body[data-mobile-panel="details"] .outline-panel { display: none; }
-  .mobile-tabs { display: flex; gap: 2px; }
-  .mobile-tabs button { width: auto; min-width: 54px; padding: 0 8px; font-size: 12px; }
-  .viewport-label { top: 7px; left: 7px; }
-}

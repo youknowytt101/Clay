@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Clay · 编辑器</title>
 </head>
-<body data-mobile-panel="outline">
+<body>
   <div id="app" class="editor-shell">
     <header class="topbar">
       <div class="brand"><strong>Clay</strong><span>场景编辑器</span></div>
@@ -17,10 +17,6 @@
       </div>
       <button id="undo" class="icon-button" title="撤销 (Ctrl+Z)" aria-label="撤销">↶</button>
       <div class="topbar-spacer"></div>
-      <div class="mobile-tabs" role="tablist" aria-label="编辑器面板">
-        <button class="icon-button panel-button" data-panel="outline" aria-pressed="true">大纲</button>
-        <button class="icon-button panel-button" data-panel="details" aria-pressed="false">详情</button>
-      </div>
     </header>
     <main class="workspace">
       <aside class="panel outline-panel">
