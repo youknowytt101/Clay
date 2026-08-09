@@ -64,12 +64,28 @@ function decodeValues(component, values, entities) {
   return decoded;
 }
 
-export function editorAffects({ componentId, patches } = {}) {
+export function editorAffects({ componentId, patches } = {}, { world = null } = {}) {
   if (typeof componentId !== 'string' || componentId.length === 0) fail('componentId must be a non-empty string');
   const affects = [];
-  for (const patch of normalizePatches(patches)) {
+  const normalized = normalizePatches(patches);
+  for (const patch of normalized) {
     for (const field of Object.keys(patch.values)) {
       affects.push(`entity:${patch.entityId}/component:${componentId}/field:${field}`);
+    }
+  }
+  if (componentId === Transform.id && world) {
+    const roots = new Set(normalized.map((patch) => patch.entityId));
+    for (const entity of world.query(Transform)) {
+      let current = entity;
+      const visited = new Set();
+      while (current && !visited.has(current.id)) {
+        if (roots.has(current.id)) {
+          affects.push(`entity:${entity.id}/chunk`);
+          break;
+        }
+        visited.add(current.id);
+        current = current.get(Transform).parent;
+      }
     }
   }
   return Object.freeze(affects.sort(compareAscii));
@@ -123,7 +139,7 @@ export function createEditorPatchAction() {
       }
       return true;
     },
-    affects: (_context, params) => editorAffects(params),
+    affects: ({ world }, params) => editorAffects(params, { world }),
     reversible: true,
     describe: {
       title: 'Patch component fields',
@@ -315,7 +331,7 @@ export function createEditorSession({ engine, bridge = null, onChange = null } =
         beforeRevision: engine.revision,
         idempotencyKey: `${runId}/${stepId}`,
         allowedActions: [EDITOR_PATCH_ACTION],
-        allowedAffects: editorAffects(params),
+        allowedAffects: editorAffects(params, { world: engine.world }),
         actions: [{ id: EDITOR_PATCH_ACTION, params }],
       });
       if (preview.receipt.status !== 'passed') {

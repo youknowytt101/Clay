@@ -68,11 +68,24 @@ class RenderBridge {
     return this;
   }
 
+  setEntityFilter(filter) {
+    const state = bridgeState.get(this);
+    if (!state || state.destroyed) throw new Error('render bridge has been destroyed');
+    if (typeof filter !== 'function') fail('entity filter must be a function');
+    state.entityFilter = filter;
+    return this;
+  }
+
   sync() {
     const state = bridgeState.get(this);
     if (!state || state.destroyed) throw new Error('render bridge has been destroyed');
-    const entities = state.world.query(Transform).map((entity) => entity);
+    const allEntities = state.world.query(Transform).map((entity) => entity);
     const matrices = resolveWorldTransforms(state.world);
+    const entities = allEntities.filter((entity) => {
+      const visible = state.entityFilter(entity, Object.freeze({ world: state.world, matrix: matrices.get(entity.id) }));
+      if (typeof visible !== 'boolean') fail(`entity filter for ${entity.id} must return boolean`);
+      return visible;
+    });
     const aliveIds = new Set(entities.map((entity) => entity.id));
     const staged = [];
 
@@ -189,6 +202,7 @@ export function createRenderBridge({
   disposeObject = () => {},
   spatialIndex = null,
   boundsForEntity = null,
+  entityFilter = () => true,
 } = {}) {
   if (!world || typeof world.query !== 'function') fail('world must come from createWorld()');
   if (!(scene instanceof Object3D)) fail('scene must be a Three.js Object3D');
@@ -198,6 +212,7 @@ export function createRenderBridge({
     fail('spatialIndex must come from createGridSpatialIndex()');
   }
   if (boundsForEntity !== null && typeof boundsForEntity !== 'function') fail('boundsForEntity must be a function');
+  if (typeof entityFilter !== 'function') fail('entityFilter must be a function');
   if (spatialIndex && !boundsForEntity) fail('boundsForEntity is required with a spatial index');
   const bridge = new RenderBridge();
   bridgeState.set(bridge, {
@@ -207,6 +222,7 @@ export function createRenderBridge({
     disposeObject,
     spatialIndex,
     boundsForEntity,
+    entityFilter,
     records: new Map(),
     destroyed: false,
   });

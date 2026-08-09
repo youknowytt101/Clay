@@ -3,11 +3,11 @@
 > **一个 AI 与人共用同一条编辑通道的通用 3D 网页游戏引擎编辑器：
 > 游戏逻辑是数据，AI 和鼠标是同一个命令层的两个前端，产出的是同一种材料。**
 
-**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f / M1-h / M1-i 已落地。**
+**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f / M1-g / M1-h / M1-i 已落地。**
 
 ```bash
-npm install && npm test        # headless 断言（60 项）
-npm run dev                    # 编辑器：大纲 / 详情 / gizmo / 多选 / AI 单步预览
+npm install && npm test        # headless 断言（64 项）
+npm run dev                    # 编辑器：大纲 / 详情 / gizmo / 多选 / 分块流式 / AI 单步预览
 ```
 
 [ADR-002](docs/design/adr-002-eventsheet-eval.md)（事件表求值语义，全项目唯一不可逆项）
@@ -76,9 +76,9 @@ Clay/
 ├─ vite.config.js
 ├─ src/
 │  ├─ core/               ECS 封装 · Action 事务 · 序列化 / checkpoint ·
-│  │                      Transform · 空间索引 · 试飞台 · 运行时版本
+│  │                      Transform · 空间分块 / 索引 · 试飞台 · 运行时版本
 │  ├─ sim/                玩法世界骨架（零 three 依赖，I7）
-│  ├─ render/             ECS → three.js 的增量只读投影
+│  ├─ render/             ECS → three.js 的增量只读投影 · 分块流式控制
 │  ├─ editor/             大纲 · schema 详情 · gizmo · 多选 · AI 单步入口
 │  ├─ ai/                 供应商无关的单步指令通道
 │  └─ main.js             浏览器入口
@@ -184,7 +184,7 @@ python tools/build-preview.py
 | ⚠️ **物理确定性**（决策 29） | [spike-001](docs/design/spike-001-rapier-determinism.md)——同机与跨 V8 版本通过；**跨 CPU 架构未验**（需第二台机器，截止点闸门 A） |
 | ⬜ **决策治理回放**（决策 42） | [ADR-004](docs/design/adr-004-evidence-governed-evolution.md) G1–G3 未做。横切约束，**不阻塞 M1** |
 
-### M1-a / M1-b / M1-c / M1-d / M1-f / M1-h / M1-i 已完成；下一步是 M1-g
+### M1-a / M1-b / M1-c / M1-d / M1-f / M1-g / M1-h / M1-i 已完成；下一步是 M1-j
 
 **M1-a ECS 封装层**已经提供稳定实体 id、按 id 升序的 `query()`、声明式组件 schema、
 连续版本迁移与结构化诊断；生产代码只在适配层导入 koota。9 项 M1-a 测试含 koota 原始错序与半写负例，
@@ -216,7 +216,11 @@ translate / rotate / scale gizmo、轨道相机与桌面三栏工作台。编辑
 候选显示真实 diff 后必须显式确认或取消；重复 request id 复用同一提案与回执，不会再次解释或执行。
 桌面编辑器内置一个确定性本地适配器用于通道验收，可对当前选择设置 X / Y / Z 位置或重命名；4 项测试覆盖隔离预览、确认 / 取消、幂等与越权负例。
 
-下一步做 **M1-g 分块流式加载**，随后进入 M1-j 确定性沙箱 J1–J3。
+**M1-g** 已提供与实体无关的稳定空间块策略、Transform 世界坐标块解析、RenderBridge 投影过滤与活动块转换回执。
+权威 ECS 世界始终常驻，块卸载只移除 Object3D 和拾取索引；跨块 Action 的真实 diff 会包含 `/chunk`，父级移动也会声明后代块影响。
+4 项测试覆盖 S1–S3、负坐标、加载顺序、卸载重载确定性与跨块事务。`U-024` 仍活动：块大小、预加载圈和卸载延迟要在 RTS / 动作两类场景实测后冻结。
+
+下一步做 **M1-j 确定性沙箱 J1–J3**，随后完成 Rapier / Transform 跨 CPU 架构实测和 ADR-004 治理回放。
 
 完整的包拆分、依赖、砍单顺序见 [roadmap.md](docs/design/roadmap.md) M1。
 

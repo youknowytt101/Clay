@@ -47,7 +47,7 @@ export async function interpretEditorSingleStep({ instruction, context }) {
   throw new Error('当前单步适配器支持设置 X / Y / Z 位置或重命名');
 }
 
-export function authorizeEditorSingleStep({ action, context }) {
+export function authorizeEditorSingleStep({ action, context, world = null }) {
   if (action?.id !== EDITOR_PATCH_ACTION) return false;
   const selection = selectionFrom(context);
   const input = action.params;
@@ -64,5 +64,5 @@ export function authorizeEditorSingleStep({ action, context }) {
     const fields = Object.keys(patch.values ?? {});
     return fields.length !== 1 || !allowedFields.has(fields[0]);
   })) return false;
-  return editorAffects(input);
+  return editorAffects(input, { world });
 }

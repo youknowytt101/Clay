@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import './editor/editor.css';
 import { createSingleStepAssistant } from './ai/single-step.js';
 import { createActionEngine, createActionRegistry } from './core/actions.js';
+import { createChunkPolicy } from './core/chunks.js';
 import { createWorld } from './core/ecs.js';
 import { PHYSICS_RUNTIME_REQUIREMENT } from './core/runtime-versions.js';
 import { createRuntimeRegistry } from './core/serialization.js';
@@ -16,6 +17,7 @@ import { createEditorPatchAction, createEditorSession, EDITOR_PATCH_ACTION } fro
 import { authorizeEditorSingleStep, interpretEditorSingleStep } from './editor/single-step-command.js';
 import { createEditorWorkbench } from './editor/workbench.js';
 import { createRenderBridge } from './render/bridge.js';
+import { createChunkStreamer, createTransformChunkResolver } from './render/chunk-streamer.js';
 
 const viewport = document.getElementById('viewport');
 const scene = new THREE.Scene();
@@ -31,6 +33,10 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 viewport.append(renderer.domElement);
+
+const streamingPolicy = Object.freeze({ chunkSize: 16, loadRadius: 1 });
+const chunkPolicy = createChunkPolicy({ size: streamingPolicy.chunkSize });
+const chunkForEntity = createTransformChunkResolver(chunkPolicy);
 
 scene.add(new THREE.HemisphereLight(0xd7e5f1, 0x33373b, 2.1));
 const sun = new THREE.DirectionalLight(0xfff3dc, 2.5);
@@ -88,6 +94,7 @@ const engine = await createActionEngine({
   world,
   runtimes: [PHYSICS_RUNTIME_REQUIREMENT],
   runtimeRegistry,
+  chunkForEntity,
 });
 
 const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -110,7 +117,8 @@ const bridge = createRenderBridge({
   disposeObject: (object) => object.material?.dispose(),
   boundsForEntity: () => ({ min: { x: -0.5, y: -0.5, z: -0.5 }, max: { x: 0.5, y: 0.5, z: 0.5 } }),
 });
-bridge.sync();
+const streamer = createChunkStreamer({ bridge, policy: chunkPolicy });
+streamer.transitionAround({ x: 0, y: 0, z: 0 }, { radius: streamingPolicy.loadRadius });
 
 const session = createEditorSession({ engine, bridge });
 function syncAppearance() {
@@ -125,7 +133,7 @@ const assistant = createSingleStepAssistant({
   registry,
   allowedActions: [EDITOR_PATCH_ACTION],
   interpret: interpretEditorSingleStep,
-  authorize: authorizeEditorSingleStep,
+  authorize: (input) => authorizeEditorSingleStep({ ...input, world: engine.world }),
 });
 const workbench = createEditorWorkbench({
   session,
@@ -141,6 +149,19 @@ const workbench = createEditorWorkbench({
   undoButton: document.getElementById('undo'),
   modeButtons: [...document.querySelectorAll('.mode-button')],
 });
+
+const chunkStatus = document.getElementById('chunk-status');
+let activeChunkSignature = '';
+function syncStreaming() {
+  const desired = chunkPolicy.idsAroundPoint(workbench.controls.target, { radius: streamingPolicy.loadRadius });
+  const signature = desired.join('|');
+  if (signature === activeChunkSignature) return;
+  const receipt = streamer.transition(desired);
+  activeChunkSignature = signature;
+  chunkStatus.textContent = `${receipt.afterChunks.length} 块`;
+}
+workbench.controls.addEventListener('change', syncStreaming);
+syncStreaming();
 
 const aiForm = document.getElementById('ai-command-form');
 const aiInput = document.getElementById('ai-instruction');
@@ -269,6 +290,7 @@ frame();
 
 addEventListener('beforeunload', () => {
   cancelAnimationFrame(animationFrame);
+  workbench.controls.removeEventListener('change', syncStreaming);
   workbench.destroy();
   bridge.destroy();
   engine.destroy();

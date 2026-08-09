@@ -111,7 +111,9 @@ export function createEditorWorkbench({
   function updateGizmo() {
     if (draggingGizmo) return;
     const entities = selectedEntities().filter((entity) => entity.has(Transform));
-    const movable = entities.filter((entity) => !entity.has(EditorTag) || !entity.get(EditorTag).locked);
+    const movable = entities.filter((entity) =>
+      bridge.getObject(entity) && (!entity.has(EditorTag) || !entity.get(EditorTag).locked)
+    );
     if (movable.length === 0) {
       gizmo.detach();
       gizmoHelper.visible = false;

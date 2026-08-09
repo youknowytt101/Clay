@@ -295,8 +295,9 @@ export async function createWorldEnvelope(world, {
   }
 
   const components = listComponents();
+  const chunkContext = Object.freeze({ world });
   for (const entity of world.query()) {
-    const chunkId = chunkForEntity(entity);
+    const chunkId = chunkForEntity(entity, chunkContext);
     assertNonEmptyString(chunkId, `chunk id for entity ${entity.id}`);
     let chunk = chunks.get(chunkId);
     if (!chunk) {

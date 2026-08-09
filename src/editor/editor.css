@@ -144,6 +144,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
   position: absolute; top: 9px; left: 10px; z-index: 2; padding: 4px 7px; border: 1px solid #ffffff1a;
   border-radius: 4px; color: #dfe5ea; background: #15181cbf; font-size: 11px; pointer-events: none;
 }
+.viewport-label span { margin-left: 4px; color: #82c9c3; }
 .viewport-axis {
   position: absolute; right: 10px; bottom: 10px; z-index: 2; display: flex; gap: 6px; color: #aeb4bc;
   font: 11px/1 ui-monospace, monospace; pointer-events: none;

@@ -172,10 +172,11 @@ python tools/build-preview.py
 | ✅ **M1-c 序列化与 checkpoint** | 确定性版本信封 + SHA-256 revision + 按块存取 + 迁移链 + 精确运行时注册表 + 命名 checkpoint；6 项测试。`U-039` 关闭 |
 | ✅ **M1-d 试飞台 + TestSpec** | registry + 固定 seed + checkpoint / 候选世界隔离 + 两层输入适配 + hard / soft oracle + 确定性证据 + M1-b validator；8 项测试。`U-043` / `U-044` 仍活动 |
 | ✅ **M1-f 渲染桥 + Transform + 拾取 + 空间索引** | ECS Transform 层级 + 稳定网格索引 + 实体射线拾取 + Three.js 增量只读投影；9 项测试覆盖层级失败、索引原子性、稳定命中、投影生命周期与禁止回写 |
+| ✅ **M1-g 分块与流式加载** | 稳定空间块策略 + Transform 世界坐标块解析 + RenderBridge 投影过滤；权威玩法世界常驻，卸载只移除表现与拾取索引；4 项测试覆盖 S1–S3 与跨块事务。`U-024` 参数调优仍活动 |
 | ✅ **M1-h 编辑器改造** | ECS 大纲 + schema 详情 + 点选 / 多选 / 拖框 + 三模式 gizmo + 桌面三栏工作台；所有持久编辑统一走 Action 事务；6 项测试覆盖 GUI 对拍、批量回滚、选择隔离、世界重绑定、层级环拒绝与父子变换 |
 | ✅ **M1-i 最小 AI 单步指令** | 供应商无关解释器边界 + Action allowlist + 宿主影响域授权 + 真实 diff 预览 + 显式确认 / 取消；重复 request id 不重复解释或执行；4 项测试含越权负例 |
 
-- **下一步**：**M1-g 分块流式加载**，随后做 M1-j 确定性沙箱 J1–J3。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
+- **下一步**：**M1-j 确定性沙箱 J1–J3**，随后补 Rapier / Transform 跨 CPU 架构实测和 ADR-004 治理回放。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
 
 > **不要往设计文档里加新范围。** 决策密度仍然超前于实现进度。
 >
