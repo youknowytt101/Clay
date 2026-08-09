@@ -3,11 +3,11 @@
 > **一个 AI 与人共用同一条编辑通道的通用 3D 网页游戏引擎编辑器：
 > 游戏逻辑是数据，AI 和鼠标是同一个命令层的两个前端，产出的是同一种材料。**
 
-**状态：M0 进行中，工程地基已落地。**
+**状态：M1 进行中，M1-a / M1-b / M1-c / M1-d / M1-f 已落地。**
 
 ```bash
-npm install && npm test        # headless 玩法层断言（6 项）
-npm run dev                    # 浏览器自检：three + Rapier 都从 npm 加载
+npm install && npm test        # headless 断言（49 项）
+npm run dev                    # 浏览器自检：ECS → three 只读渲染投影与拾取
 ```
 
 [ADR-002](docs/design/adr-002-eventsheet-eval.md)（事件表求值语义，全项目唯一不可逆项）
@@ -161,17 +161,36 @@ python tools/build-preview.py
 | | 产出 |
 |---|---|
 | ✅ **求值语义定稿**（决策 31） | [ADR-002](docs/design/adr-002-eventsheet-eval.md) **r2 · 已验证**——[两轮推演](docs/design/adr-002-walkthrough.md)走通三个样例，补上 6 处语义缺口 |
-| ✅ **AI 控制协议推演**（决策 40） | [ADR-003](docs/design/adr-003-verified-agent-loop.md) **r2**——[两轮推演](docs/design/adr-003-walkthrough.md)补上 8 处缺口；纸面完成，实现验证待 M1-b |
+| ✅ **AI 控制协议推演**（决策 40） | [ADR-003](docs/design/adr-003-verified-agent-loop.md) **r2**——[两轮推演](docs/design/adr-003-walkthrough.md)补上 8 处缺口；M1-b 已为事务、revision 与修复权限底座提供机器执行证据 |
 | ✅ **工程地基**（M0-b） | vite + three + Rapier 从 npm 加载；`npm test` 6 项 headless 断言 |
 | ✅ **ECS 选型**（ADR-001） | [spike-002](docs/design/spike-002-ecs.md) 六条判据全过，**koota 锁定**；`U-001` 关闭 |
 | ⚠️ **物理确定性**（决策 29） | [spike-001](docs/design/spike-001-rapier-determinism.md)——同机与跨 V8 版本通过；**跨 CPU 架构未验**（需第二台机器，截止点闸门 A） |
 | ⬜ **决策治理回放**（决策 42） | [ADR-004](docs/design/adr-004-evidence-governed-evolution.md) G1–G3 未做。横切约束，**不阻塞 M1** |
 
-### 下一步：M1 内核地基
+### M1-a / M1-b / M1-c / M1-d / M1-f 已完成；下一步是 M1-h
 
-先做 **M1-a ECS 封装层**，它带着一项 spike 实测出来的硬职责：
-**`query()` 必须按稳定 id 升序排序**（koota 的迭代顺序在实体 id 复用后会错位，
-见 [ADR-001 §6](docs/design/adr-001-ecs.md) 升级路径 ①）。这不是优化，是决策 29 的执行点。
+**M1-a ECS 封装层**已经提供稳定实体 id、按 id 升序的 `query()`、声明式组件 schema、
+连续版本迁移与结构化诊断；生产代码只在适配层导入 koota。9 项 M1-a 测试含 koota 原始错序与半写负例，
+`U-002` 已关闭。
+
+**M1-c** 已提供确定性版本信封、SHA-256 revision、组件 / 信封迁移链、按块存取、
+跨块实体引用恢复、精确运行时版本解析与命名 checkpoint。`U-039` 已关闭：升级 Rapier 时保留旧版本适配器，
+快照缺少精确运行时时在加载世界前失败，不得回退到最新版。
+
+**M1-b** 已提供 Action Registry、自省、JSON Schema 子集、前置条件、稳定语义 `affects`、确定性真实 diff、
+preview / commit / abort、幂等、命名 checkpoint、日志与撤销。11 项测试关闭 `U-041` / `U-042`：
+计划基线只在首步校验，后续步骤只接受本 run 推进的 revision；repair 只能使用本步骤批准的 Action 与影响域，
+越界稳定返回 `needs-review`。
+
+**M1-d** 已提供 TestSpec / oracle registry、按实际 `affects` 选择回归集、固定 seed RNG、checkpoint / 候选世界隔离运行、
+意图 / 设备两层输入适配、固定 tick、结构化证据与 M1-b validator。8 项测试证明 hard 失败阻止 commit、soft 失败不能覆盖 hard、
+oracle 不得改世界后自称通过；`U-043` / `U-044` 仍保持活动，具体设备事件格式与 `covers` 准确性留到 M3-f 验证。
+
+**M1-f** 已提供可序列化的 ECS Transform 与父子层级、稳定网格空间索引、实体射线拾取，以及 ECS → Three.js 的增量只读投影。
+9 项测试覆盖层级与序列化、循环和无效父节点、索引更新的原子性、稳定命中顺序、投影增删改、动态 bounds 与渲染对象不得回写 ECS。
+浏览器自检已迁移到真实 ECS 投影，并能点击选中稳定实体 id；BVH 与射线候选加速仍按路线图后置。
+
+下一步做 **M1-h 编辑器改造**，交付第一版真正可操作的编辑器界面：大纲、详情、gizmo 与多选。
 
 完整的包拆分、依赖、砍单顺序见 [roadmap.md](docs/design/roadmap.md) M1。
 

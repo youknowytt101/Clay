@@ -158,13 +158,22 @@ python tools/build-preview.py
 |---|---|
 | ✅ **ADR-002 求值语义** | **已验证** · r2。[两轮推演](docs/design/adr-002-walkthrough.md)补上 6 处缺口，其中 **D4 是确定性漏洞**（事件入队顺序未定义），纸面通读四版没发现 |
 | ✅ **ADR-001 ECS 选型** | **已验证** · **koota 0.6.6 锁定**（[spike-002](docs/design/spike-002-ecs.md)）。`U-001` 关闭 |
-| ✅ **ADR-003 控制协议** | r2，[两轮推演](docs/design/adr-003-walkthrough.md)补上 8 处缺口。**纸面完成，实现验证在 M1-b 内做** |
+| ✅ **ADR-003 控制协议** | r2，[两轮推演](docs/design/adr-003-walkthrough.md)补上 8 处缺口。M1-b 已为事务、revision 与修复权限底座提供机器执行证据 |
 | ✅ **M0-b 工程地基** | vite + three 0.180 + Rapier 0.20（**全部精确版本**）；`npm test` 6 项 |
 | ⚠️ **Rapier 确定性** | 同机 + 跨 V8 版本通过；**跨 CPU 架构未验**（需第二台机器，截止点闸门 A）。另发现**跨 Rapier 版本行为不同**（`U-039`） |
 | ⬜ **ADR-004 治理回放** | G1–G3 未做。横切约束，**不阻塞 M1** |
 
-- **下一步**：**M1-a ECS 封装层** → M1-c → M1-b。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
-  **M1-a 带一项 spike 实测出来的硬职责**：`query()` 必须按稳定 id 升序排序（koota 在实体 id 复用后会错位）。
+### M1 已启动（2026-08-09）
+
+| | |
+|---|---|
+| ✅ **M1-a ECS 封装层** | 稳定实体 id + 升序 `query()` + 声明式 schema + 连续版本迁移；9 项测试含 koota 原始错序与半写负例。`U-002` 关闭 |
+| ✅ **M1-b Action Registry + 步骤事务** | schema / 前置条件 / 稳定影响域 / 真实 diff + preview / commit / abort + revision / 幂等 + checkpoint / 日志 / 撤销；11 项测试。`U-041`、`U-042` 关闭 |
+| ✅ **M1-c 序列化与 checkpoint** | 确定性版本信封 + SHA-256 revision + 按块存取 + 迁移链 + 精确运行时注册表 + 命名 checkpoint；6 项测试。`U-039` 关闭 |
+| ✅ **M1-d 试飞台 + TestSpec** | registry + 固定 seed + checkpoint / 候选世界隔离 + 两层输入适配 + hard / soft oracle + 确定性证据 + M1-b validator；8 项测试。`U-043` / `U-044` 仍活动 |
+| ✅ **M1-f 渲染桥 + Transform + 拾取 + 空间索引** | ECS Transform 层级 + 稳定网格索引 + 实体射线拾取 + Three.js 增量只读投影；9 项测试覆盖层级失败、索引原子性、稳定命中、投影生命周期与禁止回写 |
+
+- **下一步**：**M1-h 编辑器改造**，交付第一版真正可操作的编辑器界面：大纲 / 详情 / gizmo / 多选。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
 
 > **不要往设计文档里加新范围。** 决策密度仍然超前于实现进度。
 >

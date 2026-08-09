@@ -8,6 +8,7 @@
  * 这个文件零 three.js 依赖 —— 不变量 I7「任何时候都能不开界面跑完整场景并断言结果」。
  */
 import RAPIER from '@dimforge/rapier3d-compat';
+export { PHYSICS_RUNTIME_REQUIREMENT } from '../core/runtime-versions.js';
 
 export const TICK_DT = 1 / 60;
 
