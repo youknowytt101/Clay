@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="680" height="1848" viewBox="0 0 680 1848" role="img">
-<title>Clay 总览图 · 对应 goals.md v17</title>
-<desc>六张图合成一份：系统全景（单一变更通道与分层）、数据模型（工程里有什么）、一帧发生什么（玩法 tick 与渲染帧分离）、用户流程（八步与主循环）、编辑器界面分区、能力覆盖面（三道闸与七款目标游戏的灰盒判定）。</desc>
+<title>Clay 总览图 · 对应 goals.md v21</title>
+<desc>六张图合成一份：系统全景（决策挑战、单一变更通道、步骤事务与验证控制循环）、数据模型（工程里有什么）、一帧发生什么（玩法 tick 与渲染帧分离）、用户流程（八步与主循环）、编辑器界面分区、能力覆盖面（三道闸与八款目标游戏的灰盒判定）。</desc>
 <style>
 svg{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:transparent}
 .cl-h{font-size:15px;font-weight:500;fill:#1a1a1a}
@@ -38,14 +38,14 @@ svg{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
 <text class="cl-s" x="233" y="91" text-anchor="middle">大纲 · 详情 · 事件表 · 数据表 · 状态机 · 皮肤 · 教程</text>
 <g class="cl-teal"><rect x="438" y="58" width="202" height="42" rx="4"/></g>
 <text class="cl-tb" x="539" y="76" text-anchor="middle">AI 作者接口</text>
-<text class="cl-s" x="539" y="91" text-anchor="middle">describe · list · apply</text>
+  <text class="cl-s" x="539" y="91" text-anchor="middle">challenge · plan · apply · verify · evolve</text>
 
 <line class="cl-a" x1="233" y1="102" x2="233" y2="120" marker-end="url(#cl-ar)"/>
 <line class="cl-a" x1="539" y1="102" x2="539" y2="120" marker-end="url(#cl-ar)"/>
 
 <g class="cl-blue"><rect x="40" y="123" width="600" height="44" rx="4"/></g>
 <text class="cl-tb" x="340" y="142" text-anchor="middle">Action 层 · 编辑期唯一变更通道</text>
-<text class="cl-s" x="340" y="158" text-anchor="middle">registry（schema · 前置条件 · 影响域 · 可逆性）· 撤销栈 · 变更日志</text>
+<text class="cl-s" x="340" y="158" text-anchor="middle">registry · 步骤事务 · revision · checkpoint · 回执 / 证据 · 撤销栈</text>
 
 <line class="cl-a" x1="340" y1="169" x2="340" y2="185" marker-end="url(#cl-ar)"/>
 
@@ -166,11 +166,11 @@ svg{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
 <line class="cl-a" x1="488" y1="1085" x2="494" y2="1085" marker-end="url(#cl-ar)"/>
 
 <g class="cl-blue"><rect x="40" y="1130" width="142" height="42" rx="4"/></g>
-<text class="cl-t" x="111" y="1148" text-anchor="middle">5 让 AI 帮忙</text><text class="cl-s" x="111" y="1163" text-anchor="middle">预览 · 接受 · 手改</text>
+<text class="cl-t" x="111" y="1148" text-anchor="middle">5 让 AI 帮忙</text><text class="cl-s" x="111" y="1163" text-anchor="middle">计划 · 批准 · 逐步执行</text>
 <g class="cl-blue"><rect x="192" y="1130" width="142" height="42" rx="4"/></g>
 <text class="cl-t" x="263" y="1148" text-anchor="middle">6 换风格 / 视听</text><text class="cl-s" x="263" y="1163" text-anchor="middle">玩法定了才谈表达</text>
 <g class="cl-blue"><rect x="344" y="1130" width="142" height="42" rx="4"/></g>
-<text class="cl-t" x="415" y="1148" text-anchor="middle">7 检查与打磨</text><text class="cl-s" x="415" y="1163" text-anchor="middle">约束无红点 · AI 试玩</text>
+<text class="cl-t" x="415" y="1148" text-anchor="middle">7 检查与打磨</text><text class="cl-s" x="415" y="1163" text-anchor="middle">hard 判定 · 证据 · 修复</text>
 <g class="cl-teal"><rect x="496" y="1130" width="144" height="42" rx="4"/></g>
 <text class="cl-t" x="568" y="1148" text-anchor="middle">8 导出</text><text class="cl-s" x="568" y="1163" text-anchor="middle">自包含工程文件</text>
 <line class="cl-a" x1="184" y1="1151" x2="190" y2="1151" marker-end="url(#cl-ar)"/>
@@ -214,9 +214,9 @@ svg{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
 <text class="cl-s" x="560" y="1392" text-anchor="middle">可写</text>
 <g class="cl-blue"><rect x="492" y="1424" width="136" height="78" rx="3"/></g>
 <text class="cl-t" x="560" y="1444" text-anchor="middle">AI 面板</text>
-<text class="cl-s" x="560" y="1461" text-anchor="middle">单步指令</text>
-<text class="cl-s" x="560" y="1476" text-anchor="middle">变更集预览</text>
-<text class="cl-s" x="560" y="1491" text-anchor="middle">内联建议</text>
+<text class="cl-s" x="560" y="1461" text-anchor="middle">计划契约 · 批准</text>
+<text class="cl-s" x="560" y="1476" text-anchor="middle">运行进度 · 停止恢复</text>
+<text class="cl-s" x="560" y="1491" text-anchor="middle">步骤 diff · 验证证据</text>
 
 <line class="cl-l" x1="40" y1="1514" x2="640" y2="1514"/>
 <g class="cl-blue"><rect x="40" y="1518" width="600" height="52" rx="4"/></g>
@@ -228,7 +228,7 @@ svg{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
 
 <!-- ══════════ 6 · 能力覆盖面 ══════════ -->
 <text class="cl-n" x="30" y="1628">6</text>
-<text class="cl-h" x="48" y="1629">能力覆盖面 · 三道闸与七款目标游戏</text>
+<text class="cl-h" x="48" y="1629">能力覆盖面 · 三道闸与八款目标游戏</text>
 <text class="cl-s" x="48" y="1646">判定标准是灰盒 MVP：核心玩法循环能不能跑通，不是能不能做出那款成品</text>
 
 <g class="cl-warn"><rect x="40" y="1660" width="194" height="52" rx="4"/></g>
@@ -254,7 +254,7 @@ svg{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
 <g class="cl-teal"><rect x="128" y="1763" width="118" height="26" rx="3"/></g><text class="cl-s" x="187" y="1780" text-anchor="middle">塞尔达　✓ 神庙式</text>
 <g class="cl-teal"><rect x="254" y="1763" width="118" height="26" rx="3"/></g><text class="cl-s" x="313" y="1780" text-anchor="middle">艾尔登　✓ Boss 房</text>
 <g class="cl-warn"><rect x="380" y="1763" width="118" height="26" rx="3"/></g><text class="cl-s" x="439" y="1780" text-anchor="middle">刺客信条　⚠ 降级</text>
-<g class="cl-teal"><rect x="506" y="1763" width="134" height="26" rx="3"/></g><text class="cl-s" x="573" y="1780" text-anchor="middle">第三人称射击　✓</text>
+<g class="cl-teal"><rect x="506" y="1763" width="134" height="26" rx="3"/></g><text class="cl-s" x="573" y="1780" text-anchor="middle">战争机器　✓ 单人 / 合作</text>
 
 <text class="cl-s" x="40" y="1812">刺客信条降级 = 潜入 + 战斗 + 沿预设点攀爬，没有丝滑跑酷（那要动画档 3，已封顶）</text>
 <text class="cl-s" x="40" y="1828">强项：RTS · MOBA · 塔防 · 战棋 · roguelite · 经营 · ARPG · 解谜　　中等：魂类 Boss 房 · 平台跳跃 · 复古 FPS　　弱项：移动本身即玩法的一类</text>
