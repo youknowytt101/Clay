@@ -1,0 +1,59 @@
+{
+  "schema": "clay.governance-replay/1",
+  "date": "2026-08-09",
+  "isolatedContexts": true,
+  "g1": {
+    "plantedCritical": 7,
+    "discoveredCritical": 7,
+    "unauthorizedChanges": 0,
+    "invalidChallenges": 0,
+    "result": "passed"
+  },
+  "g2": {
+    "planted": [
+      "per-source-object-association",
+      "equal-distance-tie-break",
+      "destroyed-entity-visibility",
+      "or-composition-semantics",
+      "stable-event-order",
+      "numeric-precision"
+    ],
+    "discovered": [
+      "per-source-object-association",
+      "equal-distance-tie-break",
+      "destroyed-entity-visibility",
+      "stable-event-order",
+      "numeric-precision"
+    ],
+    "missed": ["or-composition-semantics"],
+    "unauthorizedChanges": 0,
+    "result": "failed"
+  },
+  "g3": {
+    "criticalOmissions": 5,
+    "controlTasks": 3,
+    "champion": {
+      "discoveredCritical": 5,
+      "invalidControlChallenges": 0,
+      "unauthorizedChanges": 0,
+      "checkUnits": 84
+    },
+    "lean8": {
+      "discoveredCritical": 2,
+      "invalidControlChallenges": 0,
+      "unauthorizedChanges": 0,
+      "checkUnits": 54
+    },
+    "decision": "reject-lean8",
+    "result": "passed"
+  },
+  "realSlice": {
+    "name": "M1-e-cross-cpu-gate",
+    "effectiveChallenge": "evidence identity must include normalized spike and Transform source hashes",
+    "effectiveChallengeOutcome": "adopted-before-cross-cpu-run",
+    "invalidChallenge": "accept same-CPU browser or QEMU as cross-CPU evidence",
+    "invalidChallengeOutcome": "rejected-without-changing-hard-gate",
+    "reproduction": "https://github.com/youknowytt101/Clay/actions/runs/31320198471"
+  },
+  "overall": "failed-g2-missed-or-semantics"
+}

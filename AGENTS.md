@@ -161,7 +161,7 @@ python tools/build-preview.py
 | ✅ **ADR-003 控制协议** | r2，[两轮推演](docs/design/adr-003-walkthrough.md)补上 8 处缺口。M1-b 已为事务、revision 与修复权限底座提供机器执行证据 |
 | ✅ **M0-b 工程地基** | vite + three 0.180 + Rapier 0.20（**全部精确版本**）；`npm test` 6 项 |
 | ✅ **Rapier / Transform 确定性** | 同机 + 跨 V8 版本 + GitHub Actions Linux x64 ↔ ARM64 三项指纹通过；`U-025` / `U-046` 关闭。跨 Rapier 版本行为由精确版本注册表处理（`U-039` 已关闭） |
-| ⬜ **ADR-004 治理回放** | G1–G3 未做。横切约束，**不阻塞 M1** |
+| ⚠️ **ADR-004 治理回放** | r1：G1 / G3 通过，G2 漏掉 OR 组合语义；`U-047` 等待逻辑运算符探针批准与隔离复跑，ADR 保持“倾向已定” |
 
 ### M1 已完成（2026-08-09）
 
@@ -178,7 +178,7 @@ python tools/build-preview.py
 | ✅ **M1-i 最小 AI 单步指令** | 供应商无关解释器边界 + Action allowlist + 宿主影响域授权 + 真实 diff 预览 + 显式确认 / 取消；重复 request id 不重复解释或执行；4 项测试含越权负例 |
 | ✅ **M1-j 确定性沙箱 J1–J3** | 条件 / 动作脚本注册时静态拒绝环境时间 / 随机、网络、存储、DOM 与动态代码；执行时只注入带种子 `rng`、`tick`、`dt` 和隔离 JSON；6 项测试含确定性与静态拒绝负例。`U-011` 仍活动 |
 
-- **下一步**：做 **ADR-004 治理回放 G1–G3**。完整包列表见 [roadmap.md](docs/design/roadmap.md) M1。
+- **下一步**：裁决 `U-047`，随后做 **ADR-004 G2 第二轮隔离回放**。完整证据见 [adr-004-walkthrough.md](docs/design/adr-004-walkthrough.md)。
 
 > **不要往设计文档里加新范围。** 决策密度仍然超前于实现进度。
 >

@@ -15,6 +15,7 @@ DOCS = [
     ('adr4',      'ADR-004 · 证据治理的决策发现与演化', os.path.join(BASE, r'docs\design\adr-004-evidence-governed-evolution.md')),
     ('adr2wt',    'ADR-002 手工样例推演 · 第一轮', os.path.join(BASE, r'docs\design\adr-002-walkthrough.md')),
     ('adr3wt',    'ADR-003 手工样例推演 · 第一轮', os.path.join(BASE, r'docs\design\adr-003-walkthrough.md')),
+    ('adr4wt',    'ADR-004 治理回放 · r1', os.path.join(BASE, r'docs\design\adr-004-walkthrough.md')),
     ('spike1',    'Spike-001 · Rapier 确定性（同机）', os.path.join(BASE, r'docs\design\spike-001-rapier-determinism.md')),
     ('spike2',    'Spike-002 · ECS 选型验证', os.path.join(BASE, r'docs\design\spike-002-ecs.md')),
     ('ui',        '编辑器 UI 约定',           os.path.join(BASE, r'docs\conventions\ui.md')),

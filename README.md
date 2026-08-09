@@ -3,10 +3,10 @@
 > **一个 AI 与人共用同一条编辑通道的通用 3D 网页游戏引擎编辑器：
 > 游戏逻辑是数据，AI 和鼠标是同一个命令层的两个前端，产出的是同一种材料。**
 
-**状态：M1 已完成，10/10 个包均有机器证据；下一步是 ADR-004 治理回放。**
+**状态：M1 已完成，10/10 个包均有机器证据；ADR-004 r1 的 G2 漏掉 OR 语义，等待 `U-047` 裁决与复跑。**
 
 ```bash
-npm install && npm test        # headless 断言（71 项）
+npm install && npm test        # headless 断言（72 项）
 npm run dev                    # 编辑器：大纲 / 详情 / gizmo / 多选 / 分块流式 / AI 单步预览
 ```
 
@@ -101,6 +101,7 @@ Clay/
    │  ├─ adr-004-evidence-governed-evolution.md  决策发现 · 挑战 · 证据 · champion/challenger
    │  ├─ adr-002-walkthrough.md          ADR-002 三个样例的推演结果（已采纳）
    │  ├─ adr-003-walkthrough.md          ADR-003 三个样例的推演结果（已采纳）
+   │  ├─ adr-004-walkthrough.md          ADR-004 治理回放 r1（G2 待复跑）
    │  ├─ spike-001-rapier-determinism.md Rapier 确定性实测（同机通过，跨平台未验）
    │  └─ spike-002-ecs.md               ECS 选型验证（koota 锁定）
    ├─ diagrams/           给人看的入口（内容以 goals.md 为准）
@@ -182,9 +183,9 @@ python tools/build-preview.py
 | ✅ **工程地基**（M0-b） | vite + three + Rapier 从 npm 加载；`npm test` 6 项 headless 断言 |
 | ✅ **ECS 选型**（ADR-001） | [spike-002](docs/design/spike-002-ecs.md) 六条判据全过，**koota 锁定**；`U-001` 关闭 |
 | ✅ **物理 / Transform 确定性**（决策 29） | [spike-001](docs/design/spike-001-rapier-determinism.md)——同机、跨 V8 版本及 GitHub Actions Linux x64 ↔ ARM64 三项指纹全部通过；`U-025` / `U-046` 关闭 |
-| ⬜ **决策治理回放**（决策 42） | [ADR-004](docs/design/adr-004-evidence-governed-evolution.md) G1–G3 未做。横切约束，**不阻塞 M1** |
+| ⚠️ **决策治理回放**（决策 42） | [r1](docs/design/adr-004-walkthrough.md)：G1 / G3 通过，G2 漏掉 OR 组合语义；`U-047` 等待逻辑运算符探针的批准与隔离复跑 |
 
-### M1 已完成；下一步是 ADR-004 治理回放
+### M1 已完成；下一步是裁决 U-047 并复跑 ADR-004 G2
 
 **M1-a ECS 封装层**已经提供稳定实体 id、按 id 升序的 `query()`、声明式组件 schema、
 连续版本迁移与结构化诊断；生产代码只在适配层导入 koota。9 项 M1-a 测试含 koota 原始错序与半写负例，
@@ -225,9 +226,9 @@ translate / rotate / scale gizmo、轨道相机与桌面三栏工作台。编辑
 确定性负例、输入隔离和 condition / action 返回契约；`U-011` 仍活动，注册责任与事件表集成形状留到 M2-3 决定。
 
 **M1-e** 已在 GitHub Actions 的 Linux x64 与真实 ARM64 runner 上完成闸门 A 实测：Rapier 状态、156 个接触事件的序列以及
-四层 Transform 世界 TRS 位模式全部一致，两侧重跑和植入负例均通过。证据由第 71 项 headless 测试持续对拍；`U-025` / `U-046` 关闭。
+四层 Transform 世界 TRS 位模式全部一致，两侧重跑和植入负例均通过。证据由专门的 headless 测试持续对拍；`U-025` / `U-046` 关闭。
 
-下一步做 **ADR-004 治理回放 G1–G3**。
+下一步裁决 `U-047`，随后做 **ADR-004 G2 第二轮隔离回放**。
 
 完整的包拆分、依赖、砍单顺序见 [roadmap.md](docs/design/roadmap.md) M1。
 

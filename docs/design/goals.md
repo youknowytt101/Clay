@@ -1794,6 +1794,7 @@ TaskContract
 | **U-043** | `inputTrace` 是否分意图层 / 设备层；UI 命中测试能否作 hard oracle | 语义 | 3/2/3=18 | M3-f 前 · [ADR-003 推演](adr-003-walkthrough.md) 第 2.1 节；不解决则「错误通过率 0」不可达 |
 | **U-044** | 回归测试范围由谁圈定；`TestSpec` 是否需要 `covers` 字段 | 语义 | 2/2/3=12 | M3-f 前 · [ADR-003 推演](adr-003-walkthrough.md) 第 2.2 节；AI 可"少跑"而不触发任何现有停止条件 |
 | **U-045** | 能力缺口的识别机制；`primitivesUsed` / `capabilityGap` 是否进 `PlanStep` | 架构 | 1/3/2=6 | M3-g 前 · [ADR-003 推演](adr-003-walkthrough.md) 第 3.2 节 |
+| **U-047** | ADR-004 十二面扫描未显式覆盖规则系统的逻辑组合、量词、短路与优先级；G2 r1 因此漏掉 OR 语义 | 交付 | 1/2/3=6 | M0-d · [ADR-004 r1](adr-004-walkthrough.md) 的条件式逻辑探针 challenger 影子复跑；关键遗漏 1/1、对照无效挑战 0、越权修改 0 后由项目所有者决定是否采用 |
 
 **已决并移出**：**U-001 ECS 库选型**——2026-08-09 由 [spike-002](spike-002-ecs.md) 关闭，
 **koota 0.6.6 锁定**（六条判据全过；重放确定性成立，但迭代顺序需封装层按稳定 id 排序，

@@ -55,7 +55,7 @@ ADR-003 只需在 M1 的 Action 事务格式落地前走通。
 | **M0-a 求值语义定稿** | S | 走通 [adr-002](adr-002-eventsheet-eval.md) 的三个手工样例 → ADR 转「已验证」→ 下游对齐后转「已冻结」。**这是当前的头号阻塞项** |
 | **M0-b 构建工具链** | S | package.json + 打包器；three 的 CDN importmap 迁进构建 |
 | **M0-c AI 控制协议推演** | S | 走通 [adr-003](adr-003-verified-agent-loop.md) 的三个手工样例；冻结前先锁定 `PlanContract`、步骤事务、TestSpec、状态机、证据与停止边界 |
-| **M0-d 决策治理准入** | S | 走通 [adr-004](adr-004-evidence-governed-evolution.md) G1–G3；关键植入遗漏全发现、越权修改为 0；建立首版治理基准集、`U-NNN` 登记和 evidence package |
+| **M0-d 决策治理准入** | S | 走通 [adr-004](adr-004-evidence-governed-evolution.md) G1–G3；关键植入遗漏全发现、越权修改为 0；建立首版治理基准集、`U-NNN` 登记和 evidence package。**r1 未通过**：G1 / G3 通过，G2 漏掉 OR 语义，见 [回放证据](adr-004-walkthrough.md) 与 `U-047` |
 
 **验收 · 闸门 O + 治理准入 G0**：ADR-002 三个样例逐条推演并按 I11 冻结；ADR-004 三个回放达到关键遗漏召回 100%、
 越权修改 0。ADR-003/004 的具体检查表不在此冻结，按各自状态条件继续验证。
