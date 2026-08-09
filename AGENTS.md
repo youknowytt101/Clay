@@ -13,7 +13,7 @@
 | 想知道 | 读 |
 |---|---|
 | 这是什么 | [`docs/design/goals.md`](docs/design/goals.md) **§0 冷启动**——一句话定义 + 12 条不变量 + 已定/未定/不做 |
-| 能做什么 | [`docs/design/architecture-outline.md`](docs/design/architecture-outline.md) **§二 能力覆盖面**——七款目标游戏的灰盒判定 + 三道闸 |
+| 能做什么 | [`docs/design/architecture-outline.md`](docs/design/architecture-outline.md) **§二 能力覆盖面**——八款目标游戏的灰盒判定 + 三道闸 |
 | 现在在哪 | [`docs/design/roadmap.md`](docs/design/roadmap.md) + `git log --oneline` |
 
 接手第一件事，先确认仓库是干净的：
@@ -118,10 +118,10 @@ python tools/build-preview.py
 
 ## 4 · 当前状态
 
-- **版本**：goals.md v18
+- **版本**：goals.md v19
 - **护城河**：I1 + I3（AI 与人共用同一条编辑通道，产出同一种材料）
 - **目标游戏**（范围纪律的判据源）：
-  俯视指令簇 = 红警 / 星际 / 魔兽 / Dota 2；第三人称动作簇 = 塞尔达 / 艾尔登 / 刺客信条 / TPS
+  俯视指令簇 = 红警 / 星际 / 魔兽 / Dota 2；第三人称动作簇 = 塞尔达 / 艾尔登 / 刺客信条 / **战争机器**
 - **下一步**：ADR-002 的三个手工样例推演 → 冻结事件表求值语义
   （**全项目唯一「定错了没有退路」的一项**，纯纸面工作，不依赖任何工具链）
 
