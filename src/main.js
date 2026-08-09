@@ -34,6 +34,8 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 viewport.append(renderer.domElement);
 
+// 占位值，不是实测结论。U-024 的取值要等 M2-3 的 RTS 骨架给出真实负载后，
+// 按「确定性 + 内存 + 卡顿」三项基准定。M1-g 交付的是机制（可配 + S1–S3 有测试），不是这两个数。
 const streamingPolicy = Object.freeze({ chunkSize: 16, loadRadius: 1 });
 const chunkPolicy = createChunkPolicy({ size: streamingPolicy.chunkSize });
 const chunkForEntity = createTransformChunkResolver(chunkPolicy);

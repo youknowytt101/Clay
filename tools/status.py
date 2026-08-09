@@ -157,6 +157,7 @@ for tf in test_files:
         done_by_test.add(m.group(1))
 
 adr_ok = {n.replace('.md', '') for n, v in adr_states.items() if v in ('已验证', '已冻结')}
+completed_pkgs = set()
 
 def pkg_status(pid, line):
     """返回 (符号, 是否完成)。"""
@@ -187,12 +188,38 @@ for mm in re.finditer(r'^##\s+(M[\d.]+)([^\n]*)', roadmap, re.M):
     pkgs = sorted(found)
     syms = [pkg_status(p, found[p]) for p in pkgs]
     done = sum(1 for _, ok in syms if ok)
+    for pid, (_sym, ok) in zip(pkgs, syms):
+        if ok:
+            completed_pkgs.add(pid)
     say('  %-30s %s  (%d/%d)'
         % ((mid + rest).split('（')[0].strip()[:30],
            ''.join(s for s, _ in syms), done, len(pkgs)))
 
 say()
 say('  ✔ 有测试守着   ◆ 由已验证的 ADR 背书（纸面包）   · 未验收')
+
+# ── 4b. 截止点已过但仍活动的未决项 ─────────────────────────────────────────
+# 未决项的价值全在「再不定就要返工的那个时刻」。若截止里程碑已经验收而该项还开着，
+# 它就已经失去路由作用——而按截止点排序只显示关键档，受控/可逆档会**悄悄过期**。
+# 这条是踩出来的：U-024 截止点写着 M1-g，M1-g 交付后它仍活动，没有任何提示。
+overdue = []
+for it in items:
+    # 只看截止点本身（· 之前）里的**第一个**里程碑：
+    # 后面常跟「（原 M1-g，已延期）」这类历史说明，扫全文会误报。
+    head = re.split(r'\s*·\s*', it['due'])[0]
+    head = re.sub(r'（[^）]*）|\([^)]*\)', '', head)   # 去掉「（原 M1-g，已延期）」这类括注
+    first = re.search(r'M[\d.]+-[a-z\d]', head)
+    if first and first.group(0) in completed_pkgs:
+        overdue.append((it, first.group(0)))
+
+say()
+if overdue:
+    say('【截止点已过】里程碑已验收，但这些未决项仍活动——要么关闭，要么显式延期')
+    say()
+    for it, pid in sorted(overdue, key=lambda x: -x[0]['score']):
+        say('  U-%s  分数 %2d   截止里程碑 %s 已验收' % (it['id'], it['score'], pid))
+else:
+    say('【截止点】没有已过期仍活动的未决项 ✓')
 
 # ── 5. 测试与校验实际跑一遍 ────────────────────────────────────────────────
 say()
