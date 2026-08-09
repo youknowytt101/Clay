@@ -31,7 +31,7 @@ def read(p):
 
 def mds():
     out = glob.glob(os.path.join(BASE, 'docs', '**', '*.md'), recursive=True)
-    for n in ('README.md', 'CLAUDE.md'):
+    for n in ('README.md', 'AGENTS.md', 'CLAUDE.md'):
         p = os.path.join(BASE, n)
         if os.path.exists(p):
             out.append(p)
