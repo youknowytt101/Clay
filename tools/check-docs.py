@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """文档一致性校验。改完文档跑一遍：python tools/check-docs.py
 
-十九项检查：
+二十一项检查：
   1. 相对链接指向的文件存在
   2. goals.md 的内部锚点指向真实存在的小节
   3. 决策编号连续、无重复
@@ -21,6 +21,8 @@
   17. 每份 ADR 都进了 README 文件树与 build-preview           （v21 审计）
   18. M0 顺序：治理 G1/G2 不得前置于 ADR-002                  （v21 审计）
   19. AGENTS/README 里的 ADR 状态断言与实际一致              （交接审计）
+ 20. 证据档 vs ADR 状态：弱证据不得支撑强状态              （v23 决 43）
+ 21. 裁决依据（goals + AGENTS）行数不超过 §3.7 登记的上限   （v23 决 43）
 """
 import io, os, re, sys, glob
 
@@ -36,7 +38,7 @@ OVERTURNED = {
 
 # 已退役的术语。出现在「当前态」文档里即告警；带下列标记的行视为历史叙述，豁免。
 RETIRED_TERMS = ['术语层', '简易模式']
-HIST_MARKS = ['v15', 'v16', 'v17', 'v18', 'v19', 'v20', 'v21', 'v22', '原文', '推翻', '取消', '已于', '曾', '改写']
+HIST_MARKS = ['v15', 'v16', 'v17', 'v18', 'v19', 'v20', 'v21', 'v22', 'v23', '原文', '推翻', '取消', '已于', '曾', '改写']
 
 problems, notes = [], []
 
@@ -387,6 +389,63 @@ for name in ('AGENTS.md', 'README.md'):
         if m and set(real_state.values()) != {m.group(1)}:
             problems.append('[交接状态] %s:%d 声称全部 ADR 处于「%s」，实际分布：%s'
                             % (name, i, m.group(1), sorted(set(real_state.values()))))
+
+# ---- 20. 证据档 vs ADR 状态（v23 · 决 43）---------------------------------
+# 「已验证」这一个词原本同时承载真跑的 spike 和纸面推演，两者强度差一个量级。
+# 实际后果：ADR-002 是全项目唯一不可逆项，却以 T1 推演挂在「已验证」，
+# 且冻结的最后一个阻塞项（U-025）已在 M1-e 关闭——差一步就在零实现的情况下按 I11 冻结。
+# 这条把「证据是哪一类」变成机器可查的，而不是靠读 ADR 正文自己判断。
+STATE_ORDER = ['草案', '倾向已定', '已验证', '已冻结']
+MAX_STATE = {
+    # 运行期语义：错了会体现在运行结果上，影子回放查不出「实现出来跑不对」
+    ('运行期语义', 'T1'): '倾向已定',
+    ('运行期语义', 'T2'): '倾向已定',
+    ('运行期语义', 'T3'): '已冻结',
+    # 协议治理：约束的就是模型行为，隔离回放即其正确 oracle；但冻结一律要 T3
+    ('协议治理', 'T1'): '倾向已定',
+    ('协议治理', 'T2'): '已验证',
+    ('协议治理', 'T3'): '已冻结',
+}
+for p in sorted(glob.glob(os.path.join(BASE, 'docs', 'design', 'adr-*.md'))):
+    fn = os.path.basename(p)
+    if 'walkthrough' in fn:
+        continue
+    s = read(p)
+    tier = re.search(r'\|\s*\*\*证据档\*\*\s*\|\s*\*\*(T[123])\*\*', s)
+    kind = re.search(r'\|\s*\*\*语义类别\*\*\s*\|\s*\*\*(\S+?)\*\*', s)
+    if not tier:
+        problems.append('[证据档] %s 缺少「证据档」行（决 43）' % rel(p))
+        continue
+    if not kind:
+        problems.append('[证据档] %s 缺少「语义类别」行（决 43）' % rel(p))
+        continue
+    notes.append('%s 证据档: %s · %s' % (fn, tier.group(1), kind.group(1)))
+    key = (kind.group(1), tier.group(1))
+    if key not in MAX_STATE:
+        problems.append('[证据档] %s 的语义类别「%s」不是「运行期语义」或「协议治理」'
+                        % (rel(p), kind.group(1)))
+        continue
+    state = real_state.get(fn[:7])
+    if state not in STATE_ORDER:      # 已取代 / 待重审不受此约束
+        continue
+    cap = MAX_STATE[key]
+    if STATE_ORDER.index(state) > STATE_ORDER.index(cap):
+        problems.append('[证据档] %s 状态是「%s」，但证据只有 %s（%s）→ 最高只能到「%s」'
+                        % (rel(p), state, tier.group(1), kind.group(1), cap))
+
+# ---- 21. 裁决依据行数预算（v23 · 决 43 配套）------------------------------
+# goals.md 是每次迭代的必读裁决依据，而 §0.5 第 2 条规定决策表只增不改。
+# 裁决依据单调增长，模型上下文不增长——超了不会报错，只会表现为
+# 「接手的模型没看见某条约束」，也就是 ADR-004 要防的那种逃逸。
+budget = facts.get('裁决依据行数上限')
+if budget and budget.isdigit():
+    ruling = ['docs/design/goals.md', 'AGENTS.md']
+    total = sum(len(read(os.path.join(BASE, *n.split('/'))).split('\n')) for n in ruling)
+    notes.append('裁决依据 %d 行 / 上限 %s（goals + AGENTS）' % (total, budget))
+    if total > int(budget):
+        problems.append('[裁决依据] goals.md + AGENTS.md 共 %d 行，超过 §3.7 上限 %s。'
+                        '按 §3.7 归档被后续决策完全覆盖的条目（保留编号与链接），不要删除'
+                        % (total, budget))
 
 # ---- 输出 -----------------------------------------------------------------
 print('检查了 %d 份文档' % len(mds()))

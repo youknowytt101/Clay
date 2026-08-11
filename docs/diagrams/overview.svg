@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="680" height="1848" viewBox="0 0 680 1848" role="img">
-<title>Clay 总览图 · 对应 goals.md v22</title>
+<title>Clay 总览图 · 对应 goals.md v23</title>
 <desc>六张图合成一份：系统全景（决策挑战、单一变更通道、步骤事务与验证控制循环）、数据模型（工程里有什么）、一帧发生什么（玩法 tick 与渲染帧分离）、用户流程（八步与主循环）、编辑器界面分区、能力覆盖面（三道闸与八款目标游戏的灰盒判定）。</desc>
 <style>
 svg{font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;background:transparent}
